@@ -1,7 +1,7 @@
-#include <bplustree.h>
-#include <compiler.h>
 #include <stdlib.h>
 #include <string.h>
+#include <bplustree.h>
+#include <compiler.h>
 
 static void insert_to_parent(bplus_tree_t *tree, bplus_node_t *left,
                              bplus_key_t key, bplus_node_t *right);

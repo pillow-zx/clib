@@ -68,12 +68,14 @@
                      __FILE__, __LINE__, __func__, ##__VA_ARGS__);             \
         } while (0)
 
+#ifndef static_assert
 #define static_assert(cond, msg) _Static_assert(cond, msg)
+#endif
 
 #define Assert(cond)                                                           \
         do {                                                                   \
                 if (!(cond))                                                   \
-                        Error("Assert failed: " #cond);                        \
+                        Error("Assert", "Assert failed: " #cond);              \
         } while (0)
 
 #endif

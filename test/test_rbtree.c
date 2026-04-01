@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "test.h"
 
 struct test_node {
         int key;
@@ -50,7 +51,15 @@ static struct test_node *search_node(struct rb_root *root, int key)
         return NULL;
 }
 
-int main(void)
+static void test_rbtree_empty_root_state(void)
+{
+        DEFINE_RBROOT(root);
+        ASSERT(RB_EMPTY_ROOT(&root));
+        ASSERT(rb_first(&root) == NULL);
+        ASSERT(rb_last(&root) == NULL);
+}
+
+static void test_rbtree_insert_and_search(void)
 {
         DEFINE_RBROOT(root);
         struct test_node nodes[10];
@@ -58,51 +67,67 @@ int main(void)
         for (int i = 0; i < 10; i++) {
                 nodes[i].key = i;
                 rb_node_init(&nodes[i].rb);
-        }
-
-        assert(RB_EMPTY_ROOT(&root));
-        assert(rb_first(&root) == NULL);
-        assert(rb_last(&root) == NULL);
-
-        for (int i = 0; i < 10; i++) {
                 insert_node(&root, &nodes[i]);
         }
 
+        ASSERT(!RB_EMPTY_ROOT(&root));
+
         for (int i = 0; i < 10; i++) {
                 struct test_node *found = search_node(&root, i);
-                assert(found && found->key == i);
+                ASSERT(found && found->key == i);
         }
+}
 
-        assert(!RB_EMPTY_ROOT(&root));
+static void test_rbtree_order_traversal(void)
+{
+        DEFINE_RBROOT(root);
+        struct test_node nodes[10];
+
+        for (int i = 0; i < 10; i++) {
+                nodes[i].key = i;
+                rb_node_init(&nodes[i].rb);
+                insert_node(&root, &nodes[i]);
+        }
 
         struct rb_node *first = rb_first(&root);
         struct rb_node *last = rb_last(&root);
-        assert(first && container_of(first, struct test_node, rb)->key == 0);
-        assert(last && container_of(last, struct test_node, rb)->key == 9);
+        ASSERT(first && container_of(first, struct test_node, rb)->key == 0);
+        ASSERT(last && container_of(last, struct test_node, rb)->key == 9);
 
         int order = 0;
         for (struct rb_node *node = rb_first(&root); node;
              node = rb_next(node)) {
                 struct test_node *entry =
                         container_of(node, struct test_node, rb);
-                assert(entry->key == order++);
+                ASSERT(entry->key == order++);
         }
-        assert(order == 10);
+        ASSERT(order == 10);
 
         order = 9;
         for (struct rb_node *node = rb_last(&root); node;
              node = rb_prev(node)) {
                 struct test_node *entry =
                         container_of(node, struct test_node, rb);
-                assert(entry->key == order--);
+                ASSERT(entry->key == order--);
         }
+}
 
+static void test_rbtree_erase_single_node(void)
+{
         struct rb_root single_root = RB_ROOT;
         struct test_node single = {.key = 42};
         rb_node_init(&single.rb);
         insert_node(&single_root, &single);
         rb_erase(&single.rb, &single_root);
-        assert(RB_EMPTY_ROOT(&single_root));
+        ASSERT(RB_EMPTY_ROOT(&single_root));
+}
+
+int main(void)
+{
+        RUN_TEST(test_rbtree_empty_root_state);
+        RUN_TEST(test_rbtree_insert_and_search);
+        RUN_TEST(test_rbtree_order_traversal);
+        RUN_TEST(test_rbtree_erase_single_node);
 
         printf("All rbtree tests passed!\n");
         return 0;

@@ -2,8 +2,6 @@
 #define __CLIB_RBTREE_H__
 
 #include <types.h>
-#include <stdbool.h>
-#include <stddef.h>
 #include <compiler.h>
 
 #ifndef container_of

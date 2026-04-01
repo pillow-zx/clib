@@ -1,55 +1,88 @@
 #include <dsu.h>
 #include <assert.h>
 #include <stdio.h>
+#include "test.h"
 
 #define N 10
 
-int main(void)
+static void test_dsu_init_and_find(void)
 {
         struct dsu dsu;
         int parent[N], rank[N];
 
         dsu_init(&dsu, parent, rank, N);
-        assert(dsu.count == N);
+        ASSERT(dsu.count == N);
 
         for (int i = 0; i < N; i++) {
-                assert(dsu_find(&dsu, i) == i);
-                assert(dsu_find_iterative(&dsu, i) == i);
+                ASSERT(dsu_find(&dsu, i) == i);
+                ASSERT(dsu_find_iterative(&dsu, i) == i);
         }
+}
+
+static void test_dsu_union_and_connectivity(void)
+{
+        struct dsu dsu;
+        int parent[N], rank[N];
+        dsu_init(&dsu, parent, rank, N);
 
         dsu_union(&dsu, 0, 1);
-        assert(dsu_connected(&dsu, 0, 1));
-        assert(dsu.count == N - 1);
+        ASSERT(dsu_connected(&dsu, 0, 1));
+        ASSERT(dsu.count == N - 1);
 
         dsu_union(&dsu, 2, 3);
-        assert(dsu_connected(&dsu, 2, 3));
-        assert(!dsu_connected(&dsu, 0, 2));
-        assert(dsu.count == N - 2);
+        ASSERT(dsu_connected(&dsu, 2, 3));
+        ASSERT(!dsu_connected(&dsu, 0, 2));
+        ASSERT(dsu.count == N - 2);
 
         dsu_union(&dsu, 1, 3);
-        assert(dsu_connected(&dsu, 0, 2));
-        assert(dsu_connected(&dsu, 1, 2));
-        assert(dsu_connected(&dsu, 0, 3));
-        assert(dsu.count == N - 3);
+        ASSERT(dsu_connected(&dsu, 0, 2));
+        ASSERT(dsu_connected(&dsu, 1, 2));
+        ASSERT(dsu_connected(&dsu, 0, 3));
+        ASSERT(dsu.count == N - 3);
 
         dsu_union(&dsu, 0, 2);
-        assert(dsu.count == N - 3);
+        ASSERT(dsu.count == N - 3);
+}
+
+static void test_dsu_root_and_count(void)
+{
+        struct dsu dsu;
+        int parent[N], rank[N];
+        dsu_init(&dsu, parent, rank, N);
+
+        dsu_union(&dsu, 0, 1);
+        dsu_union(&dsu, 2, 3);
+        dsu_union(&dsu, 1, 3);
 
         int root = dsu_find(&dsu, 3);
-        assert(root == dsu_find(&dsu, 0));
-        assert(root == dsu_find(&dsu, 1));
-        assert(root == dsu_find(&dsu, 2));
+        ASSERT(root == dsu_find(&dsu, 0));
+        ASSERT(root == dsu_find(&dsu, 1));
+        ASSERT(root == dsu_find(&dsu, 2));
 
-        assert(dsu_count(&dsu) == N - 3);
+        ASSERT(dsu_count(&dsu) == N - 3);
+}
+
+static void test_dsu_chain_union(void)
+{
+        struct dsu dsu;
+        int parent[N], rank[N];
 
         dsu_init(&dsu, parent, rank, N);
         for (int i = 0; i < N - 1; i++) {
                 dsu_union(&dsu, i, i + 1);
         }
-        assert(dsu.count == 1);
+        ASSERT(dsu.count == 1);
         for (int i = 0; i < N; i++) {
-                assert(dsu_connected(&dsu, 0, i));
+                ASSERT(dsu_connected(&dsu, 0, i));
         }
+}
+
+int main(void)
+{
+        RUN_TEST(test_dsu_init_and_find);
+        RUN_TEST(test_dsu_union_and_connectivity);
+        RUN_TEST(test_dsu_root_and_count);
+        RUN_TEST(test_dsu_chain_union);
 
         printf("All DSU tests passed!\n");
         return 0;
