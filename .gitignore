@@ -4,6 +4,7 @@
 !src/
 
 !include/*.h
+!test/*.h
 !test/*.c
 !src/*.c
 
