@@ -1,4 +1,4 @@
-#include "dsu.h"
+#include <dsu.h>
 #include <assert.h>
 #include <stdio.h>
 

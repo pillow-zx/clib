@@ -1,5 +1,5 @@
-#include "bplustree.h"
 #include <assert.h>
+#include <bplustree.h>
 
 int main(void)
 {

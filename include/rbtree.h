@@ -1,6 +1,7 @@
 #ifndef __CLIB_RBTREE_H__
 #define __CLIB_RBTREE_H__
 
+#include <types.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <compiler.h>
@@ -14,7 +15,7 @@ struct rb_node {
         struct rb_node *left;
         struct rb_node *right;
         struct rb_node *parent;
-        unsigned int color : 1;
+        u32 color : 1;
 };
 
 struct rb_root {

@@ -1,7 +1,7 @@
-#include "tools.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <tools.h>
 
 static int sum(int a, int b, int c)
 {

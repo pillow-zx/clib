@@ -1,7 +1,7 @@
 #ifndef __CLIB_LIST_H__
 #define __CLIB_LIST_H__
 
-#include <stddef.h>
+#include <types.h>
 #include <compiler.h>
 
 struct list_head {
@@ -20,7 +20,8 @@ static __always_inline void INIT_LIST_HEAD(struct list_head *list)
 }
 
 static __always_inline void __list_add(struct list_head *new_node,
-                              struct list_head *prev, struct list_head *next)
+                                       struct list_head *prev,
+                                       struct list_head *next)
 {
         next->prev = new_node;
         new_node->next = next;
@@ -28,18 +29,20 @@ static __always_inline void __list_add(struct list_head *new_node,
         prev->next = new_node;
 }
 
-static __always_inline void list_add(struct list_head *new_node, struct list_head *head)
+static __always_inline void list_add(struct list_head *new_node,
+                                     struct list_head *head)
 {
         __list_add(new_node, head, head->next);
 }
 
 static __always_inline void list_add_tail(struct list_head *new_node,
-                                 struct list_head *head)
+                                          struct list_head *head)
 {
         __list_add(new_node, head->prev, head);
 }
 
-static __always_inline void __list_del(struct list_head *prev, struct list_head *next)
+static __always_inline void __list_del(struct list_head *prev,
+                                       struct list_head *next)
 {
         next->prev = prev;
         prev->next = next;
@@ -58,31 +61,33 @@ static __always_inline void list_del_init(struct list_head *entry)
         INIT_LIST_HEAD(entry);
 }
 
-static __always_inline void list_move(struct list_head *list, struct list_head *head)
+static __always_inline void list_move(struct list_head *list,
+                                      struct list_head *head)
 {
         __list_del(list->prev, list->next);
         list_add(list, head);
 }
 
 static __always_inline void list_move_tail(struct list_head *list,
-                                  struct list_head *head)
+                                           struct list_head *head)
 {
         __list_del(list->prev, list->next);
         list_add_tail(list, head);
 }
 
-static __always_inline int list_empty(const struct list_head *head)
+static __always_inline i32 list_empty(const struct list_head *head)
 {
         return head->next == head;
 }
 
-static __always_inline int list_empty_careful(const struct list_head *head)
+static __always_inline i32 list_empty_careful(const struct list_head *head)
 {
         struct list_head *next = head->next;
         return (next == head) && (next == head->prev);
 }
 
-static __always_inline struct list_head *list_first(const struct list_head *head)
+static __always_inline struct list_head *
+list_first(const struct list_head *head)
 {
         return list_empty(head) ? NULL : head->next;
 }
@@ -113,9 +118,9 @@ static __always_inline struct list_head *list_last(const struct list_head *head)
              &pos->member != (head);                                           \
              pos = n, n = list_entry(n->member.next, typeof(*pos), member))
 
-static __always_inline unsigned int list_size(const struct list_head *head)
+static __always_inline u32 list_size(const struct list_head *head)
 {
-        unsigned int count = 0;
+        u32 count = 0;
         struct list_head *pos;
         list_for_each (pos, head) {
                 count++;
@@ -123,8 +128,8 @@ static __always_inline unsigned int list_size(const struct list_head *head)
         return count;
 }
 
-static __always_inline int list_is_head(const struct list_head *list,
-                               const struct list_head *head)
+static __always_inline i32 list_is_head(const struct list_head *list,
+                                        const struct list_head *head)
 {
         return list == head;
 }

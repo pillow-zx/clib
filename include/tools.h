@@ -1,15 +1,24 @@
 #ifndef __CLIB_TOOLS_H__
 #define __CLIB_TOOLS_H__
 
-#include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
+#include <types.h>
 
-#define BITS_U8(n) ((uint8_t)(1) << (n))
+#define CONCAT(a, b) a##b
 
-#define BITS_U32(n) ((uint32_t)(1) << (n))
+#define BIT(type, n) ((type)(1) << (n))
+#define BITS_U8(n) BIT(u8, n)
+#define BITS_U32(n) BIT(u32, n)
+#define BITS_U64(n) BIT(u64, n)
+#define BIT_SET(x, n) ((x) |= BIT(usize, n))
+#define BIT_CLR(x, n) ((x) &= ~BIT(usize, n))
+#define BIT_FLIP(x, n) ((x) ^= BIT(usize, n))
+#define BIT_TEST(x, n) (!!((x) & BIT(usize, n)))
 
-#define BITS_U64(n) ((uint64_t)(1) << (n))
+#define MASK(n) (BIT(usize, n) - 1)
+#define BITS(x, hi, lo) (((x) >> (lo)) & MASK((hi) - (lo) + 1))
+
+#define MMIO_READ(addr) (*(volatile u32 *)(addr))
+#define MMIO_WRITE(addr, val) (*(volatile u32 *)(addr) = (val))
 
 #define MAP(func, ...) func(__VA_ARGS__)
 
@@ -20,12 +29,5 @@
                 const typeof(((type *)0)->member) *__mptr = (ptr);             \
                 (type *)((char *)__mptr - offsetof(type, member));             \
         })
-
-static __always_inline void clear_buffer()
-{
-        int c;
-        while ((c = getchar()) != '\n' && c != EOF)
-                ;
-}
 
 #endif

@@ -1,30 +1,29 @@
 #ifndef __CLIB_DSU_H__
 #define __CLIB_DSU_H__
 
+#include <types.h>
 #include <compiler.h>
-#include <stdbool.h>
-#include <stddef.h>
 
 struct dsu {
-        int *parent;
-        int *rank;
-        int count;
+        i32 *parent;
+        i32 *rank;
+        i32 count;
 };
 
-static inline void dsu_init(struct dsu *dsu, int *parent_mem, int *rank_mem,
-                            int n)
+static inline void dsu_init(struct dsu *dsu, i32 *parent_mem, i32 *rank_mem,
+                            i32 n)
 {
         dsu->parent = parent_mem;
         dsu->rank = rank_mem;
         dsu->count = n;
 
-        for (int i = 0; i < n; ++i) {
+        for (i32 i = 0; i < n; ++i) {
                 dsu->parent[i] = i;
                 dsu->rank[i] = 0;
         }
 }
 
-static inline int dsu_find(struct dsu *dsu, int x)
+static inline i32 dsu_find(struct dsu *dsu, i32 x)
 {
         if (dsu->parent[x] != x) {
                 dsu->parent[x] = dsu_find(dsu, dsu->parent[x]);
@@ -32,24 +31,24 @@ static inline int dsu_find(struct dsu *dsu, int x)
         return dsu->parent[x];
 }
 
-static inline int dsu_find_iterative(struct dsu *dsu, int x)
+static inline i32 dsu_find_iterative(struct dsu *dsu, i32 x)
 {
-        int root = x;
+        i32 root = x;
         while (dsu->parent[root] != root) {
                 root = dsu->parent[root];
         }
         while (dsu->parent[x] != root) {
-                int next = dsu->parent[x];
+                i32 next = dsu->parent[x];
                 dsu->parent[x] = root;
                 x = next;
         }
         return root;
 }
 
-static inline void dsu_union(struct dsu *dsu, int x, int y)
+static inline void dsu_union(struct dsu *dsu, i32 x, i32 y)
 {
-        int rootX = dsu_find(dsu, x);
-        int rootY = dsu_find(dsu, y);
+        i32 rootX = dsu_find(dsu, x);
+        i32 rootY = dsu_find(dsu, y);
 
         if (rootX == rootY)
                 return;
@@ -65,12 +64,12 @@ static inline void dsu_union(struct dsu *dsu, int x, int y)
         --dsu->count;
 }
 
-static __always_inline bool dsu_connected(struct dsu *dsu, int x, int y)
+static __always_inline bool dsu_connected(struct dsu *dsu, i32 x, i32 y)
 {
         return dsu_find(dsu, x) == dsu_find(dsu, y);
 }
 
-static __always_inline int dsu_count(const struct dsu *dsu)
+static __always_inline i32 dsu_count(const struct dsu *dsu)
 {
         return dsu->count;
 }
