@@ -1,0 +1,84 @@
+# clang-format configuration file
+# Based on K&R style with custom modifications
+
+# 基础风格：K&R
+BasedOnStyle: LLVM
+
+# 语言：仅适用于 C 语言
+Language: C
+
+# 1. 使用4个空格缩进
+IndentWidth: 8
+TabWidth: 8
+UseTab: Never
+
+# 2. 函数括号另起一行
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterFunction: true           # 函数定义后的大括号另起一行
+  AfterControlStatement: Never  # 3. if/for/while等控制语句括号不另起一行
+  AfterClass: false
+  AfterStruct: false
+  AfterUnion: false
+  AfterEnum: false
+  AfterNamespace: false
+  BeforeCatch: false
+  BeforeElse: false
+  BeforeLambdaBody: false
+  BeforeWhile: false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
+
+# 5. 行宽限制在80
+ColumnLimit: 80
+
+# 4. 不允许单行语句（if/for/while后的语句必须另起一行）
+# 但允许单条语句不加大括号
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Never
+
+# K&R 风格相关配置
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments: None
+AlignConsecutiveDeclarations: None
+AlignOperands: Align
+AlignTrailingComments: true
+
+AllowAllParametersOfDeclarationOnNextLine: true
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+
+BinPackArguments: true
+BinPackParameters: true
+
+BreakBeforeBinaryOperators: None
+BreakBeforeTernaryOperators: true
+
+ContinuationIndentWidth: 8
+
+IndentCaseLabels: false
+IndentPPDirectives: None
+
+KeepEmptyLinesAtTheStartOfBlocks: false
+MaxEmptyLinesToKeep: 1
+
+PointerAlignment: Right
+SpaceAfterCStyleCast: false
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeParens: ControlStatements
+SpaceInEmptyParentheses: false
+SpacesInCStyleCastParentheses: false
+SpacesInConditionalStatement: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+
+# 排序
+SortIncludes: false
+
+ForEachMacros:
+  - 'list_for_each'
+  - 'list_for_each_safe'
+  - 'list_for_each_entry'
+  - 'list_for_each_entry_safe'

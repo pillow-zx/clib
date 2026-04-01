@@ -1,0 +1,13 @@
+*
+!include/
+!test/
+!src/
+
+!include/*.h
+!test/*.c
+!src/*.c
+
+!Makefile
+!test.sh
+!.gitignore
+!.clang-format
