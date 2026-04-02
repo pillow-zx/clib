@@ -15,7 +15,7 @@
 #define ASSERT(cond)                                                           \
         do {                                                                   \
                 if (!(cond)) {                                                 \
-                        printf(ANSI_FG_RED "[ASSERT] ASSERT failed: " #cond    \
+                        printf(ANSI_FG_RED "[FAILED] ASSERT failed: " #cond    \
                                            " (%s:%d %s)\n" ANSI_NONE,          \
                                __FILE__, __LINE__, __func__);                  \
                 }                                                              \

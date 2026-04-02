@@ -27,7 +27,6 @@
 #define __cleanup(func) __attribute__((__cleanup__(func)))
 #define __section(section) __attribute__((__section__(section)))
 #define __weak __attribute__((__weak__))
-#define __autofree(x) __attribute__((__cleanup__(x)))
 #define __likely(x) __builtin_expect(!!(x), 1)
 #define __unlikely(x) __builtin_expect(!!(x), 0)
 #define unreachable() __builtin_unreachable()

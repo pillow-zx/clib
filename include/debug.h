@@ -19,16 +19,17 @@
 #define ANSI_BG_WHITE "\33[1;47m"
 #define ANSI_NONE "\33[0m"
 
-#define ERRORLEVEL 4
-#define INFOLEVEL 3
-#define DEBUGLEVEL 2
-#define TRACELEVEL 1
+#define ERROR 4
+#define DEBUG 3
+#define INFO 2
+#define TRACE 1
+#define ALL 0
 
 #ifndef LOGLEVEL
-#define LOGLEVEL ERRORLEVEL
+#define LOGLEVEL ALL
 #endif
 
-#define ANSI_FMT(str, fmt) fmt str ANSI_NONE
+#define ANSI_FMT(str) "%s" str ANSI_NONE
 
 #define _Log(level, ...)                                                       \
         do {                                                                   \
@@ -36,46 +37,36 @@
                         printf(__VA_ARGS__);                                   \
         } while (0)
 
-#define Info(place, format, ...)                                               \
+#define LOG_COLOR(level)                                                       \
+        ((level) == ERROR   ? ANSI_FG_RED                                      \
+         : (level) == INFO  ? ANSI_FG_GREEN                                    \
+         : (level) == DEBUG ? ANSI_FG_YELLOW                                   \
+         : (level) == TRACE ? ANSI_FG_BLUE                                     \
+                            : ANSI_NONE)
+
+#define LOG_LEVEL_STR(level)                                                   \
+        ((level) == ERROR   ? "ERROR"                                          \
+         : (level) == INFO  ? "INFO"                                           \
+         : (level) == DEBUG ? "DEBUG"                                          \
+         : (level) == TRACE ? "TRACE"                                          \
+                            : "UNK")
+
+#define print(level, place, format, ...)                                       \
         do {                                                                   \
-                _Log(INFOLEVEL,                                                \
-                     ANSI_FMT("[" place "][%s:%d %s] " format,                 \
-                              ANSI_FG_GREEN) "\n",                             \
+                _Log(level, ANSI_FMT("[%s][%s][%s:%d %s] " format),            \
+                     LOG_COLOR((level)), LOG_LEVEL_STR((level)), place,        \
                      __FILE__, __LINE__, __func__, ##__VA_ARGS__);             \
         } while (0)
 
-#define Debug(place, format, ...)                                              \
+#define println(level, place, format, ...)                                     \
         do {                                                                   \
-                _Log(DEBUGLEVEL,                                               \
-                     ANSI_FMT("[" place "][%s:%d %s] " format,                 \
-                              ANSI_FG_YELLOW) "\n",                            \
-                     __FILE__, __LINE__, __func__, ##__VA_ARGS__);             \
-        } while (0)
-
-#define Trace(place, format, ...)                                              \
-        do {                                                                   \
-                _Log(TRACELEVEL,                                               \
-                     ANSI_FMT("[" place "][%s:%d %s] " format,                 \
-                              ANSI_FG_BLUE) "\n",                              \
-                     __FILE__, __LINE__, __func__, ##__VA_ARGS__);             \
-        } while (0)
-
-#define Error(place, format, ...)                                              \
-        do {                                                                   \
-                _Log(ERRORLEVEL,                                               \
-                     ANSI_FMT("[" place "][%s:%d %s] " format,                 \
-                              ANSI_FG_RED) "\n",                               \
+                _Log(level, ANSI_FMT("[%s][%s][%s:%d %s] " format "\n"),       \
+                     LOG_COLOR((level)), LOG_LEVEL_STR((level)), place,        \
                      __FILE__, __LINE__, __func__, ##__VA_ARGS__);             \
         } while (0)
 
 #ifndef static_assert
 #define static_assert(cond, msg) _Static_assert(cond, msg)
 #endif
-
-#define Assert(cond)                                                           \
-        do {                                                                   \
-                if (!(cond))                                                   \
-                        Error("Assert", "Assert failed: " #cond);              \
-        } while (0)
 
 #endif

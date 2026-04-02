@@ -11,6 +11,6 @@ static __always_inline void auto_free(void *ptr)
                 free(*p);
 }
 
-#define autofree __autofree(auto_free)
+#define autofree __cleanup(auto_free)
 
 #endif

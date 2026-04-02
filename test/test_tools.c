@@ -4,7 +4,6 @@
 #include <tools.h>
 #include "test.h"
 
-
 static int sum(int a, int b, int c)
 {
         return a + b + c;
