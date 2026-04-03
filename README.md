@@ -29,6 +29,12 @@ typedef int64_t i64;
 typedef float f32;
 typedef double f64;
 typedef size_t usize;
+typedef intptr_t isize;
+typedef unsigned char uchar;
+
+// 支持 C23 bool 和 auto 关键字
+bool flag = true;
+auto value = 42;  // 自动推导类型
 ```
 
 ### 编译器属性 (`compiler.h`)

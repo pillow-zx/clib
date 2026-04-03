@@ -5,6 +5,13 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ < 202311L
+#define auto __auto_type
+#define bool _Bool
+#define true 1
+#define false 0
+#endif
+
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;

@@ -55,8 +55,8 @@ static void test_types_floats(void)
 
 static void test_types_boolean_and_aliases(void)
 {
-        b8 bval = true;
-        ASSERT(sizeof(b8) == 1);
+        bool bval = true;
+        ASSERT(sizeof(bool) == 1);
         ASSERT(bval == true);
         bval = false;
         ASSERT(bval == false);
