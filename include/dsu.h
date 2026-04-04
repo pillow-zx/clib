@@ -10,8 +10,8 @@ struct dsu {
         i32 count;
 };
 
-static inline void dsu_init(struct dsu *dsu, i32 *parent_mem, i32 *rank_mem,
-                            i32 n)
+static __always_inline void dsu_init(struct dsu *dsu, i32 *parent_mem,
+                                     i32 *rank_mem, i32 n)
 {
         dsu->parent = parent_mem;
         dsu->rank = rank_mem;
@@ -23,7 +23,7 @@ static inline void dsu_init(struct dsu *dsu, i32 *parent_mem, i32 *rank_mem,
         }
 }
 
-static inline i32 dsu_find(struct dsu *dsu, i32 x)
+static __must_check i32 dsu_find(struct dsu *dsu, i32 x)
 {
         if (dsu->parent[x] != x) {
                 dsu->parent[x] = dsu_find(dsu, dsu->parent[x]);
@@ -31,7 +31,8 @@ static inline i32 dsu_find(struct dsu *dsu, i32 x)
         return dsu->parent[x];
 }
 
-static inline i32 dsu_find_iterative(struct dsu *dsu, i32 x)
+static __always_inline __must_check i32 dsu_find_iterative(struct dsu *dsu,
+                                                           i32 x)
 {
         i32 root = x;
         while (dsu->parent[root] != root) {
@@ -45,7 +46,7 @@ static inline i32 dsu_find_iterative(struct dsu *dsu, i32 x)
         return root;
 }
 
-static inline void dsu_union(struct dsu *dsu, i32 x, i32 y)
+static __always_inline void dsu_union(struct dsu *dsu, i32 x, i32 y)
 {
         i32 rootX = dsu_find(dsu, x);
         i32 rootY = dsu_find(dsu, y);
@@ -64,12 +65,13 @@ static inline void dsu_union(struct dsu *dsu, i32 x, i32 y)
         --dsu->count;
 }
 
-static __always_inline bool dsu_connected(struct dsu *dsu, i32 x, i32 y)
+static __always_inline __must_check bool dsu_connected(struct dsu *dsu, i32 x,
+                                                       i32 y)
 {
         return dsu_find(dsu, x) == dsu_find(dsu, y);
 }
 
-static __always_inline i32 dsu_count(const struct dsu *dsu)
+static __always_inline __must_check __pure i32 dsu_count(const struct dsu *dsu)
 {
         return dsu->count;
 }

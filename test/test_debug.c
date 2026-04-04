@@ -49,7 +49,7 @@ static void test_debug_print_macros(void)
 {
         print(ERROR, "TEST", "print without newline");
         printf("\n");
-        println(ERROR, "TEST", "println with newline");
+        println(TRACE, "TEST", "println with newline");
         print(INFO, "TEST", "value: %d", 42);
         printf("\n");
         println(DEBUG, "TEST", "mixed: %s=%d", "answer", 42);

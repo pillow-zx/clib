@@ -5,11 +5,18 @@ ifeq ($(BUILD),release)
     CFLAGS := -O3 -DNDEBUG -flto -ffat-lto-objects -march=native
     LDFLAGS := -flto -s
 else
-    CFLAGS := -O0 -g -fsanitize=address,undefined
+    CFLAGS := -O0 -g -fsanitize=address,undefined,nullability \
+							-fno-omit-frame-pointer
     LDFLAGS := -fsanitize=address,undefined
 endif
 
-WARNINGS := -Wall -Wextra -Wshadow -Wformat=2
+WARNINGS := -Wall -Wextra -Wshadow -Wformat=2 \
+						-Wnonnull \
+						-Wnull-dereference \
+						-Wconversion \
+						-Wstrict-prototypes \
+						-Werror
+
 CFLAGS += $(WARNINGS) -Iinclude -fPIC -std=gnu23
 
 BUILD_DIR := build
@@ -34,6 +41,13 @@ all: lib
 lib: $(STATIC_OBJ) $(SHARED_LIB)
 
 test: $(TEST_BIN)
+
+analysis:
+	$(foreach src,$(SRC), \
+		clang --analyze \
+		$(CFLAGS) \
+		-Xanalyzer -analyzer-checker=core,nullability,unix \
+		$(src);)
 
 format:
 	find . -name '*.c' -o -name '*.h' | xargs clang-format -i

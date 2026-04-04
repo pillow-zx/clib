@@ -30,7 +30,7 @@ struct rb_root {
 
 #define RB_EMPTY_ROOT(root) ((root)->node == NULL)
 
-static inline void rb_node_init(struct rb_node *node)
+static __always_inline void rb_node_init(struct rb_node *node)
 {
         node->left = NULL;
         node->right = NULL;
@@ -38,17 +38,20 @@ static inline void rb_node_init(struct rb_node *node)
         node->color = 0;
 }
 
-static __always_inline struct rb_node *rb_parent(const struct rb_node *node)
+static __always_inline __must_check struct rb_node *
+rb_parent(const struct rb_node *node)
 {
         return node->parent;
 }
 
-static __always_inline int rb_is_red(const struct rb_node *node)
+static __always_inline __must_check __const int
+rb_is_red(const struct rb_node *node)
 {
         return node ? node->color : 0;
 }
 
 static __always_inline void rb_set_red(struct rb_node *node)
+
 {
         if (node)
                 node->color = 1;
@@ -60,7 +63,8 @@ static __always_inline void rb_set_black(struct rb_node *node)
                 node->color = 0;
 }
 
-static inline void rb_rotate_left(struct rb_node *node, struct rb_root *root)
+static __always_inline void rb_rotate_left(struct rb_node *node,
+                                           struct rb_root *root)
 {
         struct rb_node *right = node->right;
 
@@ -80,7 +84,8 @@ static inline void rb_rotate_left(struct rb_node *node, struct rb_root *root)
         node->parent = right;
 }
 
-static inline void rb_rotate_right(struct rb_node *node, struct rb_root *root)
+static __always_inline void rb_rotate_right(struct rb_node *node,
+                                            struct rb_root *root)
 {
         struct rb_node *left = node->left;
 
@@ -100,8 +105,9 @@ static inline void rb_rotate_right(struct rb_node *node, struct rb_root *root)
         node->parent = left;
 }
 
-static inline void rb_link_node(struct rb_node *node, struct rb_node *parent,
-                                struct rb_node **link)
+static __always_inline void rb_link_node(struct rb_node *node,
+                                         struct rb_node *parent,
+                                         struct rb_node **link)
 {
         node->left = NULL;
         node->right = NULL;
@@ -110,7 +116,8 @@ static inline void rb_link_node(struct rb_node *node, struct rb_node *parent,
         *link = node;
 }
 
-static inline struct rb_node *rb_first(const struct rb_root *root)
+static __always_inline __must_check __pure struct rb_node *
+rb_first(const struct rb_root *root)
 {
         struct rb_node *node = root->node;
         if (!node)
@@ -122,7 +129,8 @@ static inline struct rb_node *rb_first(const struct rb_root *root)
         return node;
 }
 
-static inline struct rb_node *rb_last(const struct rb_root *root)
+static __always_inline __must_check __pure struct rb_node *
+rb_last(const struct rb_root *root)
 {
         struct rb_node *node = root->node;
         if (!node)
@@ -133,7 +141,8 @@ static inline struct rb_node *rb_last(const struct rb_root *root)
         return node;
 }
 
-static inline struct rb_node *rb_next(const struct rb_node *node)
+static __always_inline __must_check __pure struct rb_node *
+rb_next(const struct rb_node *node)
 {
         if (node->right) {
                 node = node->right;
@@ -151,7 +160,8 @@ static inline struct rb_node *rb_next(const struct rb_node *node)
         return parent;
 }
 
-static inline struct rb_node *rb_prev(const struct rb_node *node)
+static __always_inline __must_check __pure struct rb_node *
+rb_prev(const struct rb_node *node)
 {
         if (node->left) {
                 node = node->left;
@@ -167,6 +177,70 @@ static inline struct rb_node *rb_prev(const struct rb_node *node)
         }
         return parent;
 }
+
+#define rbtree_for_each(pos, root)                                             \
+        for ((pos) = rb_first(root); (pos) != NULL; (pos) = rb_next(pos))
+
+#define rbtree_for_each_safe(pos, n, root)                                     \
+        for ((pos) = rb_first(root), (n) = (pos) ? rb_next(pos) : NULL;        \
+             (pos) != NULL; (pos) = (n), (n) = (n) ? rb_next(n) : NULL)
+
+#define rbtree_for_each_reverse(pos, root)                                     \
+        for ((pos) = rb_last(root); (pos) != NULL; (pos) = rb_prev(pos))
+
+#define rbtree_for_each_reverse_safe(pos, n, root)                             \
+        for ((pos) = rb_last(root), (n) = (pos) ? rb_prev(pos) : NULL;         \
+             (pos) != NULL; (pos) = (n), (n) = (n) ? rb_prev(n) : NULL)
+
+#define rbtree_entry(ptr, type, member) container_of(ptr, type, member)
+
+#define rbtree_for_each_entry(pos, root, member)                               \
+        for ((pos) = (root)->node ? rbtree_entry (rb_first(root),              \
+                                                  typeof(*(pos)), member)      \
+                                  : NULL;                                      \
+             (pos) != NULL;                                                    \
+             (pos) = rb_next(&(pos)->member)                                   \
+                             ? rbtree_entry (rb_next(&(pos)->member),          \
+                                             typeof(*(pos)), member)           \
+                             : NULL)
+
+#define rbtree_for_each_entry_safe(pos, n, root, member)                       \
+        for ((pos) = (root)->node ? rbtree_entry (rb_first(root),              \
+                                                  typeof(*(pos)), member)      \
+                                  : NULL,                                      \
+            (n) = (pos) && rb_next(&(pos)->member)                             \
+                          ? rbtree_entry (rb_next(&(pos)->member),             \
+                                          typeof(*(pos)), member)              \
+                          : NULL;                                              \
+             (pos) != NULL; (pos) = (n),                                       \
+            (n) = (n) && rb_next(&(n)->member)                                 \
+                                    ? rbtree_entry (rb_next(&(n)->member),     \
+                                                    typeof(*(pos)), member)    \
+                                    : NULL)
+
+#define rbtree_for_each_entry_reverse(pos, root, member)                       \
+        for ((pos) = (root)->node ? rbtree_entry (rb_last(root),               \
+                                                  typeof(*(pos)), member)      \
+                                  : NULL;                                      \
+             (pos) != NULL;                                                    \
+             (pos) = rb_prev(&(pos)->member)                                   \
+                             ? rbtree_entry (rb_prev(&(pos)->member),          \
+                                             typeof(*(pos)), member)           \
+                             : NULL)
+
+#define rbtree_for_each_entry_reverse_safe(pos, n, root, member)               \
+        for ((pos) = (root)->node ? rbtree_entry (rb_last(root),               \
+                                                  typeof(*(pos)), member)      \
+                                  : NULL,                                      \
+            (n) = (pos) && rb_prev(&(pos)->member)                             \
+                          ? rbtree_entry (rb_prev(&(pos)->member),             \
+                                          typeof(*(pos)), member)              \
+                          : NULL;                                              \
+             (pos) != NULL; (pos) = (n),                                       \
+            (n) = (n) && rb_prev(&(n)->member)                                 \
+                                    ? rbtree_entry (rb_prev(&(n)->member),     \
+                                                    typeof(*(pos)), member)    \
+                                    : NULL)
 
 void rb_insert_color(struct rb_node *node, struct rb_root *root);
 

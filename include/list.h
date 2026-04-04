@@ -75,24 +75,27 @@ static __always_inline void list_move_tail(struct list_head *list,
         list_add_tail(list, head);
 }
 
-static __always_inline i32 list_empty(const struct list_head *head)
+static __always_inline __must_check __pure bool
+list_empty(const struct list_head *head)
 {
         return head->next == head;
 }
 
-static __always_inline i32 list_empty_careful(const struct list_head *head)
+static __always_inline __must_check __pure bool
+list_empty_careful(const struct list_head *head)
 {
         struct list_head *next = head->next;
         return (next == head) && (next == head->prev);
 }
 
-static __always_inline struct list_head *
+static __always_inline __must_check __pure struct list_head *
 list_first(const struct list_head *head)
 {
         return list_empty(head) ? NULL : head->next;
 }
 
-static __always_inline struct list_head *list_last(const struct list_head *head)
+static __always_inline __must_check __pure struct list_head *
+list_last(const struct list_head *head)
 {
         return list_empty(head) ? NULL : head->prev;
 }
@@ -118,9 +121,9 @@ static __always_inline struct list_head *list_last(const struct list_head *head)
              &pos->member != (head);                                           \
              pos = n, n = list_entry(n->member.next, typeof(*pos), member))
 
-static __always_inline u32 list_size(const struct list_head *head)
+static __always_inline __must_check usize list_size(const struct list_head *head)
 {
-        u32 count = 0;
+        usize count = 0;
         struct list_head *pos;
         list_for_each (pos, head) {
                 count++;
@@ -128,8 +131,8 @@ static __always_inline u32 list_size(const struct list_head *head)
         return count;
 }
 
-static __always_inline i32 list_is_head(const struct list_head *list,
-                                        const struct list_head *head)
+static __always_inline __must_check __nonnull((1, 2)) bool list_is_head(
+        const struct list_head *list, const struct list_head *head)
 {
         return list == head;
 }

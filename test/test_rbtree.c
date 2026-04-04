@@ -95,19 +95,15 @@ static void test_rbtree_order_traversal(void)
         ASSERT(last && container_of(last, struct test_node, rb)->key == 9);
 
         int order = 0;
-        for (struct rb_node *node = rb_first(&root); node;
-             node = rb_next(node)) {
-                struct test_node *entry =
-                        container_of(node, struct test_node, rb);
+        struct test_node *entry;
+        rbtree_for_each_entry (entry, &root, rb) {
                 ASSERT(entry->key == order++);
         }
+
         ASSERT(order == 10);
 
         order = 9;
-        for (struct rb_node *node = rb_last(&root); node;
-             node = rb_prev(node)) {
-                struct test_node *entry =
-                        container_of(node, struct test_node, rb);
+        rbtree_for_each_entry_reverse (entry, &root, rb) {
                 ASSERT(entry->key == order--);
         }
 }

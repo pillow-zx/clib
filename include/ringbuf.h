@@ -27,30 +27,35 @@ static __always_inline void ringbuf_init(struct ringbuf *rb, void *buf,
         rb->tail = 0;
 }
 
-static __always_inline bool ringbuf_empty(const struct ringbuf *rb)
+static __always_inline __must_check __pure bool
+ringbuf_empty(const struct ringbuf *rb)
 {
         return rb->head == rb->tail;
 }
 
-static __always_inline bool ringbuf_full(const struct ringbuf *rb)
+static __always_inline __must_check __pure bool
+ringbuf_full(const struct ringbuf *rb)
 {
         return ((rb->head + 1) % rb->size) == rb->tail;
 }
 
-static __always_inline usize ringbuf_used(const struct ringbuf *rb)
+static __always_inline __must_check __pure usize
+ringbuf_used(const struct ringbuf *rb)
 {
         if (rb->head >= rb->tail)
                 return rb->head - rb->tail;
         return rb->size - rb->tail + rb->head;
 }
 
-static __always_inline usize ringbuf_free(const struct ringbuf *rb)
+static __always_inline __must_check __pure usize
+ringbuf_free(const struct ringbuf *rb)
 {
         return rb->size - ringbuf_used(rb) - 1;
 }
 
-static __always_inline usize ringbuf_write(struct ringbuf *rb, const void *data,
-                                           usize len)
+static __always_inline __must_check usize ringbuf_write(struct ringbuf *rb,
+                                                        const void *data,
+                                                        usize len)
 {
         usize free_space = ringbuf_free(rb);
         usize write_len = len > free_space ? free_space : len;
@@ -64,8 +69,8 @@ static __always_inline usize ringbuf_write(struct ringbuf *rb, const void *data,
         return write_len;
 }
 
-static __always_inline usize ringbuf_read(struct ringbuf *rb, void *data,
-                                          usize len)
+static __always_inline __must_check usize ringbuf_read(struct ringbuf *rb,
+                                                       void *data, usize len)
 {
         usize used = ringbuf_used(rb);
         usize read_len = len > used ? used : len;
@@ -79,7 +84,8 @@ static __always_inline usize ringbuf_read(struct ringbuf *rb, void *data,
         return read_len;
 }
 
-static __always_inline i32 ringbuf_write_byte(struct ringbuf *rb, char byte)
+static __always_inline __must_check i32 ringbuf_write_byte(struct ringbuf *rb,
+                                                           char byte)
 {
         if (ringbuf_full(rb))
                 return -1;
@@ -89,22 +95,23 @@ static __always_inline i32 ringbuf_write_byte(struct ringbuf *rb, char byte)
         return 0;
 }
 
-static __always_inline i32 ringbuf_read_byte(struct ringbuf *rb)
+static __always_inline __must_check i32 ringbuf_read_byte(struct ringbuf *rb)
 {
         if (ringbuf_empty(rb))
                 return -1;
 
-        char byte = rb->buf[rb->tail];
+        uchar byte = (uchar)rb->buf[rb->tail];
         rb->tail = (rb->tail + 1) % rb->size;
         return (i32)byte;
 }
 
-static __always_inline i32 ringbuf_peek_byte(const struct ringbuf *rb)
+static __always_inline __must_check i32
+ringbuf_peek_byte(const struct ringbuf *rb)
 {
         if (ringbuf_empty(rb))
                 return -1;
 
-        return (i32)rb->buf[rb->tail];
+        return (i32)(uchar)rb->buf[rb->tail];
 }
 
 static __always_inline void ringbuf_reset(struct ringbuf *rb)
@@ -113,8 +120,8 @@ static __always_inline void ringbuf_reset(struct ringbuf *rb)
         rb->tail = 0;
 }
 
-static __always_inline usize ringbuf_peek(const struct ringbuf *rb, void *data,
-                                          usize len)
+static __always_inline __must_check usize ringbuf_peek(const struct ringbuf *rb,
+                                                       void *data, usize len)
 {
         usize used = ringbuf_used(rb);
         usize peek_len = len > used ? used : len;
@@ -129,7 +136,8 @@ static __always_inline usize ringbuf_peek(const struct ringbuf *rb, void *data,
         return peek_len;
 }
 
-static __always_inline usize ringbuf_skip(struct ringbuf *rb, usize len)
+static __always_inline __must_check usize ringbuf_skip(struct ringbuf *rb,
+                                                       usize len)
 {
         usize used = ringbuf_used(rb);
         usize skip_len = len > used ? used : len;

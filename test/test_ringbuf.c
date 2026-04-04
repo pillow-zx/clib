@@ -91,7 +91,8 @@ static void test_peek(void)
         struct ringbuf rb;
         ringbuf_init(&rb, buffer, sizeof(buffer));
 
-        ringbuf_write(&rb, "ABC", 3);
+        /* ringbuf_write(&rb, "ABC", 3); */
+        ASSERT(ringbuf_write(&rb, "ABC", 3) == 3);
 
         char out[4] = {0};
         ASSERT(ringbuf_peek(&rb, out, 3) == 3);
@@ -107,13 +108,15 @@ static void test_skip(void)
         struct ringbuf rb;
         ringbuf_init(&rb, buffer, sizeof(buffer));
 
-        ringbuf_write(&rb, "ABCDE", 5);
+        /* ringbuf_write(&rb, "ABCDE", 5); */
+        ASSERT(ringbuf_write(&rb, "ABCDE", 5) == 5);
 
         ASSERT(ringbuf_skip(&rb, 2) == 2);
         ASSERT(ringbuf_used(&rb) == 3);
 
         char out[4] = {0};
-        ringbuf_read(&rb, out, 3);
+        /* ringbuf_read(&rb, out, 3); */
+        ASSERT(ringbuf_read(&rb, out, 3) == 3);
         ASSERT(memcmp(out, "CDE", 3) == 0);
 }
 
@@ -126,7 +129,8 @@ static void test_free_space(void)
         ASSERT(ringbuf_free(&rb) == 7);
         ASSERT(RINGBUF_SIZE(&rb) == 7);
 
-        ringbuf_write_byte(&rb, 1);
+        /* ringbuf_write_byte(&rb, 1); */
+        ASSERT(ringbuf_write_byte(&rb, 1) == 0);
         ASSERT(ringbuf_free(&rb) == 6);
         ASSERT(ringbuf_used(&rb) == 1);
 }
@@ -137,7 +141,8 @@ static void test_reset(void)
         struct ringbuf rb;
         ringbuf_init(&rb, buffer, sizeof(buffer));
 
-        ringbuf_write(&rb, "Test", 4);
+        /* ringbuf_write(&rb, "Test", 4); */
+        ASSERT(ringbuf_write(&rb, "Test", 4) == 4);
         ASSERT(ringbuf_used(&rb) == 4);
 
         ringbuf_reset(&rb);
