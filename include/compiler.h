@@ -9,7 +9,7 @@
  * generate better code and catch potential bugs at compile time.
  *
  * @author clib
- * @date 2024
+ * @date 2026
  */
 
 #ifndef __CLIB_COMPILER_H__

@@ -11,7 +11,7 @@
  *   - Otherwise, provide your own implementations of the required functions
  *
  * @author clib
- * @date 2024
+ * @date 2026
  */
 
 #ifndef __CLIB_PORT_H__
@@ -180,25 +180,4 @@ __weak int cprintf(const char *fmt, ...)
 }
 
 #endif /* CLIB_USE_LIBC */
-
-/* ===========================================================================
- * Utility Macros
- * ===========================================================================
- */
-
-#ifndef container_of
-/**
- * @brief Get containing struct from a pointer to its member
- * @param ptr Pointer to the member
- * @param type Type of the containing struct
- * @param member Name of the member within the struct
- * @return Pointer to the containing struct
- */
-#define container_of(ptr, type, member)                                        \
-        ({                                                                     \
-                const typeof(((type *)0)->member) *__mptr = (ptr);             \
-                (type *)((char *)__mptr - offsetof(type, member));             \
-        })
-#endif
-
 #endif /* __CLIB_PORT_H__ */
