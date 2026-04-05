@@ -1,5 +1,4 @@
-#include <stdlib.h>
-#include <string.h>
+#include <port.h>
 #include <bplustree.h>
 #include <compiler.h>
 
@@ -8,9 +7,9 @@ static void insert_to_parent(bplus_tree_t *tree, bplus_node_t *left,
 
 static bplus_node_t *node_create(node_type_t type)
 {
-        bplus_node_t *node = (bplus_node_t *)calloc(1, sizeof(bplus_node_t));
+        bplus_node_t *node = (bplus_node_t *)ccalloc(1, sizeof(bplus_node_t));
         if (__unlikely(!node))
-                return NULL;
+                return nullptr;
         node->type = type;
         node->key_count = 0;
         return node;
@@ -24,7 +23,7 @@ static void node_destroy(bplus_node_t *node)
                 for (usize i = 0; i <= node->key_count; i++)
                         node_destroy(node->children[i]);
         }
-        free(node);
+        cfree(node);
 }
 
 static usize binary_search(const bplus_key_t *keys, usize count,
@@ -54,13 +53,13 @@ static bplus_value_t leaf_search(const bplus_node_t *leaf, bplus_key_t key)
         if (idx < leaf->key_count && leaf->keys[idx] == key)
                 return leaf->leaf.values[idx];
 
-        return NULL;
+        return nullptr;
 }
 
 bplus_value_t bplus_search(const bplus_tree_t *tree, bplus_key_t key)
 {
         if (__unlikely(!tree || !tree->root))
-                return NULL;
+                return nullptr;
 
         bplus_node_t *node = tree->root;
         while (node->type == NODE_INTERNAL) {
@@ -77,7 +76,7 @@ bplus_value_t bplus_search(const bplus_tree_t *tree, bplus_key_t key)
 bplus_node_t *bplus_find_leaf(const bplus_tree_t *tree, bplus_key_t key)
 {
         if (__unlikely(!tree || !tree->root))
-                return NULL;
+                return nullptr;
 
         bplus_node_t *node = tree->root;
         while (node->type == NODE_INTERNAL) {
@@ -98,13 +97,13 @@ bplus_result_t bplus_range_query(const bplus_tree_t *tree, bplus_key_t start,
         if (__unlikely(!tree || !tree->first_leaf))
                 return result;
 
-        size_t capacity = 64;
-        result.keys = (bplus_key_t *)malloc(capacity * sizeof(bplus_key_t));
+        usize capacity = 64;
+        result.keys = (bplus_key_t *)cmalloc(capacity * sizeof(bplus_key_t));
         result.values =
-                (bplus_value_t *)malloc(capacity * sizeof(bplus_value_t));
+                (bplus_value_t *)cmalloc(capacity * sizeof(bplus_value_t));
         if (__unlikely(!result.keys || !result.values)) {
-                free(result.keys);
-                free(result.values);
+                cfree(result.keys);
+                cfree(result.values);
                 return (bplus_result_t){0};
         }
         result.capacity = capacity;
@@ -119,11 +118,11 @@ bplus_result_t bplus_range_query(const bplus_tree_t *tree, bplus_key_t start,
                         if (leaf->keys[i] >= start) {
                                 if (result.count >= result.capacity) {
                                         result.capacity *= 2;
-                                        result.keys = (bplus_key_t *)realloc(
+                                        result.keys = (bplus_key_t *)crealloc(
                                                 result.keys,
                                                 result.capacity *
                                                         sizeof(bplus_key_t));
-                                        result.values = (bplus_value_t *)realloc(
+                                        result.values = (bplus_value_t *)crealloc(
                                                 result.values,
                                                 result.capacity *
                                                         sizeof(bplus_value_t));
@@ -143,8 +142,8 @@ bplus_result_t bplus_range_query(const bplus_tree_t *tree, bplus_key_t start,
 void bplus_result_free(bplus_result_t *result)
 {
         if (result) {
-                free(result->keys);
-                free(result->values);
+                cfree(result->keys);
+                cfree(result->values);
                 result->count = 0;
                 result->capacity = 0;
         }
@@ -154,16 +153,16 @@ static void node_insert_key(bplus_node_t *node, usize idx, bplus_key_t key,
                             bplus_value_t value, bplus_node_t *child)
 {
         if (node->type == NODE_LEAF) {
-                memmove(&node->keys[idx + 1], &node->keys[idx],
-                        (node->key_count - idx) * sizeof(bplus_key_t));
-                memmove(&node->leaf.values[idx + 1], &node->leaf.values[idx],
-                        (node->key_count - idx) * sizeof(bplus_value_t));
+                cmemmove(&node->keys[idx + 1], &node->keys[idx],
+                         (node->key_count - idx) * sizeof(bplus_key_t));
+                cmemmove(&node->leaf.values[idx + 1], &node->leaf.values[idx],
+                         (node->key_count - idx) * sizeof(bplus_value_t));
                 node->leaf.values[idx] = value;
         } else {
-                memmove(&node->keys[idx + 1], &node->keys[idx],
-                        (node->key_count - idx) * sizeof(bplus_key_t));
-                memmove(&node->children[idx + 2], &node->children[idx + 1],
-                        (node->key_count - idx) * sizeof(bplus_node_t *));
+                cmemmove(&node->keys[idx + 1], &node->keys[idx],
+                         (node->key_count - idx) * sizeof(bplus_key_t));
+                cmemmove(&node->children[idx + 2], &node->children[idx + 1],
+                         (node->key_count - idx) * sizeof(bplus_node_t *));
                 node->children[idx + 1] = child;
         }
         node->keys[idx] = key;
@@ -177,10 +176,10 @@ static bplus_key_t leaf_split(bplus_node_t *left, bplus_node_t *right)
         right->type = NODE_LEAF;
         right->key_count = left->key_count - mid;
 
-        memcpy(right->keys, &left->keys[mid],
-               right->key_count * sizeof(bplus_key_t));
-        memcpy(right->leaf.values, &left->leaf.values[mid],
-               right->key_count * sizeof(bplus_value_t));
+        cmemcpy(right->keys, &left->keys[mid],
+                right->key_count * sizeof(bplus_key_t));
+        cmemcpy(right->leaf.values, &left->leaf.values[mid],
+                right->key_count * sizeof(bplus_value_t));
 
         left->key_count = mid;
 
@@ -198,10 +197,10 @@ static bplus_key_t internal_split(bplus_node_t *left, bplus_node_t *right)
         right->type = NODE_INTERNAL;
         right->key_count = left->key_count - mid - 1;
 
-        memcpy(right->keys, &left->keys[mid + 1],
-               right->key_count * sizeof(bplus_key_t));
-        memcpy(right->children, &left->children[mid + 1],
-               (right->key_count + 1) * sizeof(bplus_node_t *));
+        cmemcpy(right->keys, &left->keys[mid + 1],
+                right->key_count * sizeof(bplus_key_t));
+        cmemcpy(right->children, &left->children[mid + 1],
+                (right->key_count + 1) * sizeof(bplus_node_t *));
 
         left->key_count = mid;
 
@@ -236,7 +235,7 @@ static void insert_non_full(bplus_tree_t *tree, bplus_node_t *node,
                         node->leaf.values[idx] = value;
                         return;
                 }
-                node_insert_key(node, idx, key, value, NULL);
+                node_insert_key(node, idx, key, value, nullptr);
                 tree->count++;
         } else if (node->type == NODE_INTERNAL) {
                 if (idx < node->key_count && key >= node->keys[idx])
@@ -296,20 +295,20 @@ static void insert_to_parent(bplus_tree_t *tree, bplus_node_t *left,
         }
 
         if (node_is_full(parent)) {
-                memmove(&parent->keys[idx + 1], &parent->keys[idx],
-                        (parent->key_count - idx) * sizeof(bplus_key_t));
-                memmove(&parent->children[idx + 2], &parent->children[idx + 1],
-                        (parent->key_count - idx) * sizeof(bplus_node_t *));
+                cmemmove(&parent->keys[idx + 1], &parent->keys[idx],
+                         (parent->key_count - idx) * sizeof(bplus_key_t));
+                cmemmove(&parent->children[idx + 2], &parent->children[idx + 1],
+                         (parent->key_count - idx) * sizeof(bplus_node_t *));
                 parent->keys[idx] = key;
                 parent->children[idx + 1] = right;
                 parent->key_count++;
 
                 node_split(tree, parent);
         } else {
-                memmove(&parent->keys[idx + 1], &parent->keys[idx],
-                        (parent->key_count - idx) * sizeof(bplus_key_t));
-                memmove(&parent->children[idx + 2], &parent->children[idx + 1],
-                        (parent->key_count - idx) * sizeof(bplus_node_t *));
+                cmemmove(&parent->keys[idx + 1], &parent->keys[idx],
+                         (parent->key_count - idx) * sizeof(bplus_key_t));
+                cmemmove(&parent->children[idx + 2], &parent->children[idx + 1],
+                         (parent->key_count - idx) * sizeof(bplus_node_t *));
                 parent->keys[idx] = key;
                 parent->children[idx + 1] = right;
                 parent->key_count++;
@@ -345,10 +344,10 @@ bool bplus_insert(bplus_tree_t *tree, bplus_key_t key, bplus_value_t value)
 
 static void leaf_remove(bplus_node_t *leaf, usize idx)
 {
-        memmove(&leaf->keys[idx], &leaf->keys[idx + 1],
-                (leaf->key_count - idx - 1) * sizeof(bplus_key_t));
-        memmove(&leaf->leaf.values[idx], &leaf->leaf.values[idx + 1],
-                (leaf->key_count - idx - 1) * sizeof(bplus_value_t));
+        cmemmove(&leaf->keys[idx], &leaf->keys[idx + 1],
+                 (leaf->key_count - idx - 1) * sizeof(bplus_key_t));
+        cmemmove(&leaf->leaf.values[idx], &leaf->leaf.values[idx + 1],
+                 (leaf->key_count - idx - 1) * sizeof(bplus_value_t));
         leaf->key_count--;
 }
 
@@ -356,12 +355,12 @@ __maybe_unused static void borrow_from_left(bplus_node_t *node,
                                             bplus_node_t *parent, int idx,
                                             bplus_node_t *left_sibling)
 {
-        memmove(&node->keys[1], &node->keys[0],
-                node->key_count * sizeof(bplus_key_t));
+        cmemmove(&node->keys[1], &node->keys[0],
+                 node->key_count * sizeof(bplus_key_t));
 
         if (node->type == NODE_INTERNAL) {
-                memmove(&node->children[1], &node->children[0],
-                        (node->key_count + 1) * sizeof(bplus_node_t *));
+                cmemmove(&node->children[1], &node->children[0],
+                         (node->key_count + 1) * sizeof(bplus_node_t *));
                 node->children[0] =
                         left_sibling->children[left_sibling->key_count];
         }
@@ -383,13 +382,13 @@ __maybe_unused static void borrow_from_right(bplus_node_t *node,
         if (node->type == NODE_INTERNAL) {
                 node->children[node->key_count + 1] =
                         right_sibling->children[0];
-                memmove(&right_sibling->children[0],
-                        &right_sibling->children[1],
-                        right_sibling->key_count * sizeof(bplus_node_t *));
+                cmemmove(&right_sibling->children[0],
+                         &right_sibling->children[1],
+                         right_sibling->key_count * sizeof(bplus_node_t *));
         }
 
-        memmove(&right_sibling->keys[0], &right_sibling->keys[1],
-                (right_sibling->key_count - 1) * sizeof(bplus_key_t));
+        cmemmove(&right_sibling->keys[0], &right_sibling->keys[1],
+                 (right_sibling->key_count - 1) * sizeof(bplus_key_t));
 
         node->key_count++;
         right_sibling->key_count--;
@@ -397,10 +396,10 @@ __maybe_unused static void borrow_from_right(bplus_node_t *node,
 
 __maybe_unused static void merge_leaves(bplus_node_t *left, bplus_node_t *right)
 {
-        memcpy(&left->keys[left->key_count], right->keys,
-               right->key_count * sizeof(bplus_key_t));
-        memcpy(&left->leaf.values[left->key_count], right->leaf.values,
-               right->key_count * sizeof(bplus_value_t));
+        cmemcpy(&left->keys[left->key_count], right->keys,
+                right->key_count * sizeof(bplus_key_t));
+        cmemcpy(&left->leaf.values[left->key_count], right->leaf.values,
+                right->key_count * sizeof(bplus_value_t));
 
         left->key_count += right->key_count;
         left->leaf.next = right->leaf.next;
@@ -410,10 +409,10 @@ __maybe_unused static void merge_internals(bplus_node_t *left, bplus_key_t key,
                                            bplus_node_t *right)
 {
         left->keys[left->key_count] = key;
-        memcpy(&left->keys[left->key_count + 1], right->keys,
-               right->key_count * sizeof(bplus_key_t));
-        memcpy(&left->children[left->key_count + 1], right->children,
-               (right->key_count + 1) * sizeof(bplus_node_t *));
+        cmemcpy(&left->keys[left->key_count + 1], right->keys,
+                right->key_count * sizeof(bplus_key_t));
+        cmemcpy(&left->children[left->key_count + 1], right->children,
+                (right->key_count + 1) * sizeof(bplus_node_t *));
 
         left->key_count += right->key_count + 1;
 }
@@ -438,7 +437,7 @@ bool bplus_delete(bplus_tree_t *tree, bplus_key_t key)
                 if (tree->root->type == NODE_INTERNAL) {
                         bplus_node_t *old_root = tree->root;
                         tree->root = tree->root->children[0];
-                        free(old_root);
+                        cfree(old_root);
                         tree->height--;
                 } else {
                 }
@@ -449,12 +448,12 @@ bool bplus_delete(bplus_tree_t *tree, bplus_key_t key)
 
 bplus_tree_t *bplus_create(void)
 {
-        bplus_tree_t *tree = (bplus_tree_t *)calloc(1, sizeof(bplus_tree_t));
+        bplus_tree_t *tree = (bplus_tree_t *)ccalloc(1, sizeof(bplus_tree_t));
         if (__unlikely(!tree))
-                return NULL;
+                return nullptr;
 
-        tree->root = NULL;
-        tree->first_leaf = NULL;
+        tree->root = nullptr;
+        tree->first_leaf = nullptr;
         tree->height = 0;
         tree->count = 0;
 
@@ -466,7 +465,7 @@ void bplus_destroy(bplus_tree_t *tree)
         if (__unlikely(!tree))
                 return;
         node_destroy(tree->root);
-        free(tree);
+        cfree(tree);
 }
 
 usize bplus_count(const bplus_tree_t *tree)

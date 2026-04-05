@@ -1,6 +1,8 @@
 #ifndef __CLIB_DEBUG_H__
 #define __CLIB_DEBUG_H__
 
+#include <port.h>
+
 #define ANSI_FG_BLACK "\33[1;30m"
 #define ANSI_FG_RED "\33[1;31m"
 #define ANSI_FG_GREEN "\33[1;32m"
@@ -34,7 +36,7 @@
 #define _Log(level, ...)                                                       \
         do {                                                                   \
                 if (level >= LOGLEVEL)                                         \
-                        printf(__VA_ARGS__);                                   \
+                        cprintf(__VA_ARGS__);                                  \
         } while (0)
 
 #define LOG_COLOR(level)                                                       \

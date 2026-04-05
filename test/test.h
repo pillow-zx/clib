@@ -5,9 +5,9 @@
 #define ANSI_FG_RED "\33[1;31m"
 #define ANSI_NONE "\33[0m"
 
-#define RUN_TEST(fn)                                                           \
+#define RUN_TEST(fn, ...)                                                      \
         do {                                                                   \
-                fn();                                                          \
+                fn(__VA_ARGS__);                                               \
                 printf(ANSI_FG_GREEN "[PASS]: %s:%d %s\n" ANSI_NONE, __FILE__, \
                        __LINE__, __func__);                                    \
         } while (0)

@@ -1,7 +1,5 @@
 #include <rbtree.h>
 #include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include "test.h"
 
 struct test_node {
@@ -17,7 +15,7 @@ static int cmp(int a, int b)
 static void insert_node(struct rb_root *root, struct test_node *node)
 {
         struct rb_node **link = &root->node;
-        struct rb_node *parent = NULL;
+        struct rb_node *parent = nullptr;
 
         while (*link) {
                 parent = *link;
@@ -48,15 +46,15 @@ static struct test_node *search_node(struct rb_root *root, int key)
                 else
                         return entry;
         }
-        return NULL;
+        return nullptr;
 }
 
 static void test_rbtree_empty_root_state(void)
 {
         DEFINE_RBROOT(root);
         ASSERT(RB_EMPTY_ROOT(&root));
-        ASSERT(rb_first(&root) == NULL);
-        ASSERT(rb_last(&root) == NULL);
+        ASSERT(rb_first(&root) == nullptr);
+        ASSERT(rb_last(&root) == nullptr);
 }
 
 static void test_rbtree_insert_and_search(void)

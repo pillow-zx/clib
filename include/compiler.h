@@ -546,6 +546,38 @@
 #define unreachable() __builtin_unreachable()
 #endif
 
+/**
+ * @def offsetof(t, d)
+ * @brief Calculates the byte offset of a member within a struct type
+ *
+ * Returns the offset in bytes from the beginning of the struct type to
+ * the specified member. This is useful for:
+ * - Low-level memory manipulation
+ * - Implementing container_of() macros
+ * - Working with binary data structures
+ *
+ * @param t Struct type name
+ * @param d Member name within the struct
+ * @return Byte offset of the member within the struct
+ *
+ * @note Uses __builtin_offsetof for compiler-specific implementation
+ *
+ * Example:
+ * @code
+ * struct header {
+ *     u32 magic;
+ *     u16 version;
+ *     u32 crc;
+ * };
+ *
+ * size_t version_offset = offsetof(struct header, version); // Returns 4
+ * size_t crc_offset = offsetof(struct header, crc);         // Returns 8
+ * @endcode
+ */
+#ifndef offsetof
+#define offsetof(t, d) __builtin_offsetof(t, d)
+#endif
+
 /** @} */ // end of optimization group
 
 /**

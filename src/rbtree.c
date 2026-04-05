@@ -1,4 +1,3 @@
-#include "types.h"
 #include <assert.h>
 #include <rbtree.h>
 
@@ -53,11 +52,11 @@ void rb_insert_color(struct rb_node *node, struct rb_root *root)
 
 void rb_erase_color(struct rb_node *parent, struct rb_root *root)
 {
-        struct rb_node *node = NULL;
+        struct rb_node *node = nullptr;
 
         while ((!node || !rb_is_red(node)) && node != root->node) {
                 /* 此处断言仅为了消除clang警告，非语义问题 */
-                assert(parent != NULL);
+                assert(parent != nullptr);
                 if (parent->left == node) {
                         struct rb_node *sibling = parent->right;
 
@@ -69,7 +68,7 @@ void rb_erase_color(struct rb_node *parent, struct rb_root *root)
                         }
 
                         /* 此处断言仅为了消除clang警告，非语义问题*/
-                        assert(sibling != NULL);
+                        assert(sibling != nullptr);
                         if ((!sibling->left || !rb_is_red(sibling->left)) &&
                             (!sibling->right || !rb_is_red(sibling->right))) {
                                 rb_set_red(sibling);

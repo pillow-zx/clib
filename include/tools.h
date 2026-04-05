@@ -2,6 +2,7 @@
 #define __CLIB_TOOLS_H__
 
 #include <types.h>
+#include <port.h>
 
 #define CONCAT(a, b) a##b
 

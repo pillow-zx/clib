@@ -14,8 +14,8 @@ static void test_list_init_state(void)
         LIST_HEAD(list);
         ASSERT(list_empty(&list));
         ASSERT(list_size(&list) == 0);
-        ASSERT(list_first(&list) == NULL);
-        ASSERT(list_last(&list) == NULL);
+        ASSERT(list_first(&list) == nullptr);
+        ASSERT(list_last(&list) == nullptr);
 
         struct list_head list2;
         INIT_LIST_HEAD(&list2);
@@ -71,8 +71,8 @@ static void test_list_delete_and_move_nodes(void)
 
         list_del(&d1.node);
         ASSERT(list_size(&list) == 2);
-        ASSERT(d1.node.prev == NULL);
-        ASSERT(d1.node.next == NULL);
+        ASSERT(d1.node.prev == nullptr);
+        ASSERT(d1.node.next == nullptr);
 
         list_del_init(&d3.node);
         ASSERT(list_size(&list) == 1);

@@ -86,7 +86,6 @@ ForEachMacros:
   - 'rbtree_for_each_safe'
   - 'rbtree_for_each_reverse'
   - 'rbtree_for_each_reverse_safe'
-  - 'rbtree_entry'
   - 'rbtree_for_each_entry'
   - 'rbtree_for_each_entry_safe'
   - 'rbtree_for_each_entry_reverse'

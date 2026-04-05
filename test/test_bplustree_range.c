@@ -6,7 +6,7 @@
 static void test_bplustree_range_query_results(void)
 {
         bplus_tree_t *tree = bplus_create();
-        ASSERT(tree != NULL);
+        ASSERT(tree != nullptr);
 
         int values[5] = {100, 200, 300, 400, 500};
         for (int i = 0; i < 5; i++) {

@@ -6,7 +6,7 @@
 static void test_bplustree_basic_create_insert_search_count(void)
 {
         bplus_tree_t *tree = bplus_create();
-        ASSERT(tree != NULL);
+        ASSERT(tree != nullptr);
 
         int values[] = {10, 20, 30};
         ASSERT(bplus_insert(tree, 1, &values[0]));

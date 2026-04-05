@@ -4,6 +4,11 @@
 #include <compiler.h>
 #include <types.h>
 
+#ifndef container_of
+#define container_of(ptr, type, member)                                        \
+        ((type *)((char *)(ptr) - offsetof(type, member)))
+#endif
+
 #define BPLUS_ORDER 64
 
 #define BPLUS_MAX_KEYS (BPLUS_ORDER - 1)

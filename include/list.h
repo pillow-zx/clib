@@ -2,7 +2,9 @@
 #define __CLIB_LIST_H__
 
 #include <types.h>
+#include <port.h>
 #include <compiler.h>
+#include <tools.h>
 
 struct list_head {
         struct list_head *prev;
@@ -51,8 +53,8 @@ static __always_inline void __list_del(struct list_head *prev,
 static __always_inline void list_del(struct list_head *entry)
 {
         __list_del(entry->prev, entry->next);
-        entry->prev = NULL;
-        entry->next = NULL;
+        entry->prev = nullptr;
+        entry->next = nullptr;
 }
 
 static __always_inline void list_del_init(struct list_head *entry)
@@ -91,13 +93,13 @@ list_empty_careful(const struct list_head *head)
 static __always_inline __must_check __pure struct list_head *
 list_first(const struct list_head *head)
 {
-        return list_empty(head) ? NULL : head->next;
+        return list_empty(head) ? nullptr : head->next;
 }
 
 static __always_inline __must_check __pure struct list_head *
 list_last(const struct list_head *head)
 {
-        return list_empty(head) ? NULL : head->prev;
+        return list_empty(head) ? nullptr : head->prev;
 }
 
 #define list_for_each(pos, head)                                               \
@@ -121,7 +123,8 @@ list_last(const struct list_head *head)
              &pos->member != (head);                                           \
              pos = n, n = list_entry(n->member.next, typeof(*pos), member))
 
-static __always_inline __must_check usize list_size(const struct list_head *head)
+static __always_inline __must_check
+usize list_size(const struct list_head *head)
 {
         usize count = 0;
         struct list_head *pos;

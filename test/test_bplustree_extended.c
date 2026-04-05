@@ -6,14 +6,14 @@
 static void test_bplustree_extended_empty_tree_and_invalid_ops(void)
 {
         bplus_tree_t *tree = bplus_create();
-        ASSERT(tree != NULL);
+        ASSERT(tree != nullptr);
         ASSERT(bplus_count(tree) == 0);
         ASSERT(bplus_height(tree) == 0);
 
         ASSERT(!bplus_delete(tree, 1));
 
-        ASSERT(bplus_search(tree, 1) == NULL);
-        ASSERT(bplus_find_leaf(tree, 1) == NULL);
+        ASSERT(bplus_search(tree, 1) == nullptr);
+        ASSERT(bplus_find_leaf(tree, 1) == nullptr);
 
         bplus_destroy(tree);
 }
@@ -21,7 +21,7 @@ static void test_bplustree_extended_empty_tree_and_invalid_ops(void)
 static void test_bplustree_extended_insert_search_update_delete(void)
 {
         bplus_tree_t *tree = bplus_create();
-        ASSERT(tree != NULL);
+        ASSERT(tree != nullptr);
 
         int values[100];
         for (int i = 0; i < 100; i++) {
@@ -46,7 +46,7 @@ static void test_bplustree_extended_insert_search_update_delete(void)
 
         ASSERT(bplus_delete(tree, 50));
         ASSERT(bplus_count(tree) == 99);
-        ASSERT(bplus_search(tree, 50) == NULL);
+        ASSERT(bplus_search(tree, 50) == nullptr);
 
         ASSERT(!bplus_delete(tree, 50));
         ASSERT(!bplus_delete(tree, -1));
@@ -69,7 +69,7 @@ static void test_bplustree_extended_insert_search_update_delete(void)
 static void test_bplustree_extended_large_dataset_range_queries(void)
 {
         bplus_tree_t *tree = bplus_create();
-        ASSERT(tree != NULL);
+        ASSERT(tree != nullptr);
 
         for (int i = 0; i < 10000; i++) {
                 ASSERT(bplus_insert(tree, i, (void *)(long)i));
@@ -104,15 +104,15 @@ static void test_bplustree_extended_null_tree_api_guards(void)
 {
         bplus_result_t result;
 
-        ASSERT(bplus_search(NULL, 0) == NULL);
-        ASSERT(bplus_find_leaf(NULL, 0) == NULL);
-        ASSERT(!bplus_insert(NULL, 0, NULL));
-        ASSERT(!bplus_delete(NULL, 0));
-        ASSERT(bplus_count(NULL) == 0);
-        ASSERT(bplus_height(NULL) == 0);
-        bplus_destroy(NULL);
+        ASSERT(bplus_search(nullptr, 0) == nullptr);
+        ASSERT(bplus_find_leaf(nullptr, 0) == nullptr);
+        ASSERT(!bplus_insert(nullptr, 0, nullptr));
+        ASSERT(!bplus_delete(nullptr, 0));
+        ASSERT(bplus_count(nullptr) == 0);
+        ASSERT(bplus_height(nullptr) == 0);
+        bplus_destroy(nullptr);
 
-        result = bplus_range_query(NULL, 0, 10);
+        result = bplus_range_query(nullptr, 0, 10);
         ASSERT(result.count == 0);
 }
 

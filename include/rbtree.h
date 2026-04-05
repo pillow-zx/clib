@@ -1,13 +1,10 @@
 #ifndef __CLIB_RBTREE_H__
 #define __CLIB_RBTREE_H__
 
+#include <port.h>
 #include <types.h>
 #include <compiler.h>
-
-#ifndef container_of
-#define container_of(ptr, type, member)                                        \
-        ((type *)((char *)(ptr) - offsetof(type, member)))
-#endif
+#include <tools.h>
 
 struct rb_node {
         struct rb_node *left;
@@ -23,18 +20,18 @@ struct rb_root {
 #define RB_ROOT                                                                \
         (struct rb_root)                                                       \
         {                                                                      \
-                .node = NULL                                                   \
+                .node = nullptr                                                \
         }
 
 #define DEFINE_RBROOT(name) struct rb_root name = RB_ROOT
 
-#define RB_EMPTY_ROOT(root) ((root)->node == NULL)
+#define RB_EMPTY_ROOT(root) ((root)->node == nullptr)
 
 static __always_inline void rb_node_init(struct rb_node *node)
 {
-        node->left = NULL;
-        node->right = NULL;
-        node->parent = NULL;
+        node->left = nullptr;
+        node->right = nullptr;
+        node->parent = nullptr;
         node->color = 0;
 }
 
@@ -109,8 +106,8 @@ static __always_inline void rb_link_node(struct rb_node *node,
                                          struct rb_node *parent,
                                          struct rb_node **link)
 {
-        node->left = NULL;
-        node->right = NULL;
+        node->left = nullptr;
+        node->right = nullptr;
         node->parent = parent;
         node->color = 1;
         *link = node;
@@ -121,7 +118,7 @@ rb_first(const struct rb_root *root)
 {
         struct rb_node *node = root->node;
         if (!node)
-                return NULL;
+                return nullptr;
 
         while (node->left)
                 node = node->left;
@@ -134,7 +131,7 @@ rb_last(const struct rb_root *root)
 {
         struct rb_node *node = root->node;
         if (!node)
-                return NULL;
+                return nullptr;
 
         while (node->right)
                 node = node->right;
@@ -179,68 +176,68 @@ rb_prev(const struct rb_node *node)
 }
 
 #define rbtree_for_each(pos, root)                                             \
-        for ((pos) = rb_first(root); (pos) != NULL; (pos) = rb_next(pos))
+        for ((pos) = rb_first(root); (pos) != nullptr; (pos) = rb_next(pos))
 
 #define rbtree_for_each_safe(pos, n, root)                                     \
-        for ((pos) = rb_first(root), (n) = (pos) ? rb_next(pos) : NULL;        \
-             (pos) != NULL; (pos) = (n), (n) = (n) ? rb_next(n) : NULL)
+        for ((pos) = rb_first(root), (n) = (pos) ? rb_next(pos) : nullptr;     \
+             (pos) != nullptr; (pos) = (n), (n) = (n) ? rb_next(n) : nullptr)
 
 #define rbtree_for_each_reverse(pos, root)                                     \
-        for ((pos) = rb_last(root); (pos) != NULL; (pos) = rb_prev(pos))
+        for ((pos) = rb_last(root); (pos) != nullptr; (pos) = rb_prev(pos))
 
 #define rbtree_for_each_reverse_safe(pos, n, root)                             \
-        for ((pos) = rb_last(root), (n) = (pos) ? rb_prev(pos) : NULL;         \
-             (pos) != NULL; (pos) = (n), (n) = (n) ? rb_prev(n) : NULL)
+        for ((pos) = rb_last(root), (n) = (pos) ? rb_prev(pos) : nullptr;      \
+             (pos) != nullptr; (pos) = (n), (n) = (n) ? rb_prev(n) : nullptr)
 
 #define rbtree_entry(ptr, type, member) container_of(ptr, type, member)
 
 #define rbtree_for_each_entry(pos, root, member)                               \
-        for ((pos) = (root)->node ? rbtree_entry (rb_first(root),              \
-                                                  typeof(*(pos)), member)      \
-                                  : NULL;                                      \
-             (pos) != NULL;                                                    \
+        for ((pos) = (root)->node ? rbtree_entry(rb_first(root),               \
+                                                 typeof(*(pos)), member)       \
+                                  : nullptr;                                   \
+             (pos) != nullptr;                                                 \
              (pos) = rb_next(&(pos)->member)                                   \
-                             ? rbtree_entry (rb_next(&(pos)->member),          \
-                                             typeof(*(pos)), member)           \
-                             : NULL)
+                             ? rbtree_entry(rb_next(&(pos)->member),           \
+                                            typeof(*(pos)), member)            \
+                             : nullptr)
 
 #define rbtree_for_each_entry_safe(pos, n, root, member)                       \
-        for ((pos) = (root)->node ? rbtree_entry (rb_first(root),              \
-                                                  typeof(*(pos)), member)      \
-                                  : NULL,                                      \
+        for ((pos) = (root)->node ? rbtree_entry(rb_first(root),               \
+                                                 typeof(*(pos)), member)       \
+                                  : nullptr,                                   \
             (n) = (pos) && rb_next(&(pos)->member)                             \
-                          ? rbtree_entry (rb_next(&(pos)->member),             \
-                                          typeof(*(pos)), member)              \
-                          : NULL;                                              \
-             (pos) != NULL; (pos) = (n),                                       \
-            (n) = (n) && rb_next(&(n)->member)                                 \
-                                    ? rbtree_entry (rb_next(&(n)->member),     \
-                                                    typeof(*(pos)), member)    \
-                                    : NULL)
+                          ? rbtree_entry(rb_next(&(pos)->member),              \
+                                         typeof(*(pos)), member)               \
+                          : nullptr;                                           \
+             (pos) != nullptr;                                                 \
+             (pos) = (n), (n) = (n) && rb_next(&(n)->member)                   \
+                                        ? rbtree_entry(rb_next(&(n)->member),  \
+                                                       typeof(*(pos)), member) \
+                                        : nullptr)
 
 #define rbtree_for_each_entry_reverse(pos, root, member)                       \
-        for ((pos) = (root)->node ? rbtree_entry (rb_last(root),               \
-                                                  typeof(*(pos)), member)      \
-                                  : NULL;                                      \
-             (pos) != NULL;                                                    \
+        for ((pos) = (root)->node ? rbtree_entry(rb_last(root),                \
+                                                 typeof(*(pos)), member)       \
+                                  : nullptr;                                   \
+             (pos) != nullptr;                                                 \
              (pos) = rb_prev(&(pos)->member)                                   \
-                             ? rbtree_entry (rb_prev(&(pos)->member),          \
-                                             typeof(*(pos)), member)           \
-                             : NULL)
+                             ? rbtree_entry(rb_prev(&(pos)->member),           \
+                                            typeof(*(pos)), member)            \
+                             : nullptr)
 
 #define rbtree_for_each_entry_reverse_safe(pos, n, root, member)               \
-        for ((pos) = (root)->node ? rbtree_entry (rb_last(root),               \
-                                                  typeof(*(pos)), member)      \
-                                  : NULL,                                      \
+        for ((pos) = (root)->node ? rbtree_entry(rb_last(root),                \
+                                                 typeof(*(pos)), member)       \
+                                  : nullptr,                                   \
             (n) = (pos) && rb_prev(&(pos)->member)                             \
-                          ? rbtree_entry (rb_prev(&(pos)->member),             \
-                                          typeof(*(pos)), member)              \
-                          : NULL;                                              \
-             (pos) != NULL; (pos) = (n),                                       \
-            (n) = (n) && rb_prev(&(n)->member)                                 \
-                                    ? rbtree_entry (rb_prev(&(n)->member),     \
-                                                    typeof(*(pos)), member)    \
-                                    : NULL)
+                          ? rbtree_entry(rb_prev(&(pos)->member),              \
+                                         typeof(*(pos)), member)               \
+                          : nullptr;                                           \
+             (pos) != nullptr;                                                 \
+             (pos) = (n), (n) = (n) && rb_prev(&(n)->member)                   \
+                                        ? rbtree_entry(rb_prev(&(n)->member),  \
+                                                       typeof(*(pos)), member) \
+                                        : nullptr)
 
 void rb_insert_color(struct rb_node *node, struct rb_root *root);
 
