@@ -4,6 +4,12 @@
 
 static void insert_to_parent(bplus_tree_t *tree, bplus_node_t *left,
                              bplus_key_t key, bplus_node_t *right);
+static void borrow_from_left(bplus_node_t *node, bplus_node_t *parent,
+                             usize idx, bplus_node_t *left_sibling);
+static void borrow_from_right(bplus_node_t *node, bplus_node_t *parent,
+                              usize idx, bplus_node_t *right_sibling);
+static void merge_into_left(bplus_node_t *left, bplus_node_t *right,
+                            bplus_node_t *parent, usize parent_key_idx);
 
 static bplus_node_t *node_create(node_type_t type)
 {
@@ -351,70 +357,177 @@ static void leaf_remove(bplus_node_t *leaf, usize idx)
         leaf->key_count--;
 }
 
-__maybe_unused static void borrow_from_left(bplus_node_t *node,
-                                            bplus_node_t *parent, int idx,
-                                            bplus_node_t *left_sibling)
+static bplus_node_t *find_parent(bplus_node_t *root, bplus_node_t *target)
+{
+        if (root == target || root->type == NODE_LEAF)
+                return nullptr;
+
+        for (usize i = 0; i <= root->key_count; i++) {
+                if (root->children[i] == target)
+                        return root;
+                bplus_node_t *found = find_parent(root->children[i], target);
+                if (found)
+                        return found;
+        }
+        return nullptr;
+}
+
+static usize find_child_index(bplus_node_t *parent, bplus_node_t *child)
+{
+        for (usize i = 0; i <= parent->key_count; i++) {
+                if (parent->children[i] == child)
+                        return i;
+        }
+        return 0;
+}
+
+static void rebalance_node(bplus_tree_t *tree, bplus_node_t *node)
+{
+        if (node == tree->root)
+                return;
+
+        bplus_node_t *parent = find_parent(tree->root, node);
+        if (!parent)
+                return;
+
+        usize idx = find_child_index(parent, node);
+
+        if (!node_is_underflow(node))
+                return;
+
+        bplus_node_t *left_sibling =
+                (idx > 0) ? parent->children[idx - 1] : nullptr;
+        bplus_node_t *right_sibling =
+                (idx < parent->key_count) ? parent->children[idx + 1] : nullptr;
+
+        if (left_sibling && left_sibling->key_count > BPLUS_MIN_KEYS) {
+                borrow_from_left(node, parent, idx, left_sibling);
+                return;
+        }
+        if (right_sibling && right_sibling->key_count > BPLUS_MIN_KEYS) {
+                borrow_from_right(node, parent, idx, right_sibling);
+                return;
+        }
+
+        if (left_sibling) {
+                merge_into_left(left_sibling, node, parent, idx - 1);
+                rebalance_node(tree, parent);
+        } else if (right_sibling) {
+                merge_into_left(node, right_sibling, parent, idx);
+                rebalance_node(tree, parent);
+        }
+}
+
+static void rebalance_after_delete(bplus_tree_t *tree, bplus_node_t *leaf)
+{
+        rebalance_node(tree, leaf);
+
+        while (tree->root->type == NODE_INTERNAL &&
+               tree->root->key_count == 0) {
+                bplus_node_t *old_root = tree->root;
+                tree->root = tree->root->children[0];
+                cfree(old_root);
+                tree->height--;
+        }
+
+        if (tree->count == 0 && tree->root) {
+                cfree(tree->root);
+                tree->root = nullptr;
+                tree->first_leaf = nullptr;
+                tree->height = 0;
+        }
+}
+
+static void borrow_from_left(bplus_node_t *node, bplus_node_t *parent,
+                             usize idx, bplus_node_t *left_sibling)
 {
         cmemmove(&node->keys[1], &node->keys[0],
                  node->key_count * sizeof(bplus_key_t));
 
-        if (node->type == NODE_INTERNAL) {
+        if (node->type == NODE_LEAF) {
+                cmemmove(&node->leaf.values[1], &node->leaf.values[0],
+                         node->key_count * sizeof(bplus_value_t));
+                node->keys[0] = left_sibling->keys[left_sibling->key_count - 1];
+                node->leaf.values[0] =
+                        left_sibling->leaf.values[left_sibling->key_count - 1];
+                parent->keys[idx - 1] = node->keys[0];
+        } else {
                 cmemmove(&node->children[1], &node->children[0],
                          (node->key_count + 1) * sizeof(bplus_node_t *));
+                node->keys[0] = parent->keys[idx - 1];
                 node->children[0] =
                         left_sibling->children[left_sibling->key_count];
+                parent->keys[idx - 1] =
+                        left_sibling->keys[left_sibling->key_count - 1];
         }
-
-        node->keys[0] = parent->keys[idx - 1];
-        parent->keys[idx - 1] = left_sibling->keys[left_sibling->key_count - 1];
 
         node->key_count++;
         left_sibling->key_count--;
 }
 
-__maybe_unused static void borrow_from_right(bplus_node_t *node,
-                                             bplus_node_t *parent, int idx,
-                                             bplus_node_t *right_sibling)
+static void borrow_from_right(bplus_node_t *node, bplus_node_t *parent,
+                              usize idx, bplus_node_t *right_sibling)
 {
-        node->keys[node->key_count] = parent->keys[idx];
-        parent->keys[idx] = right_sibling->keys[0];
-
-        if (node->type == NODE_INTERNAL) {
+        if (node->type == NODE_LEAF) {
+                node->keys[node->key_count] = right_sibling->keys[0];
+                node->leaf.values[node->key_count] =
+                        right_sibling->leaf.values[0];
+                parent->keys[idx] = right_sibling->keys[1];
+        } else {
+                node->keys[node->key_count] = parent->keys[idx];
                 node->children[node->key_count + 1] =
                         right_sibling->children[0];
-                cmemmove(&right_sibling->children[0],
-                         &right_sibling->children[1],
-                         right_sibling->key_count * sizeof(bplus_node_t *));
+                parent->keys[idx] = right_sibling->keys[0];
         }
 
         cmemmove(&right_sibling->keys[0], &right_sibling->keys[1],
                  (right_sibling->key_count - 1) * sizeof(bplus_key_t));
 
+        if (right_sibling->type == NODE_LEAF) {
+                cmemmove(&right_sibling->leaf.values[0],
+                         &right_sibling->leaf.values[1],
+                         (right_sibling->key_count - 1) *
+                                 sizeof(bplus_value_t));
+        } else {
+                cmemmove(&right_sibling->children[0],
+                         &right_sibling->children[1],
+                         right_sibling->key_count * sizeof(bplus_node_t *));
+        }
+
         node->key_count++;
         right_sibling->key_count--;
 }
 
-__maybe_unused static void merge_leaves(bplus_node_t *left, bplus_node_t *right)
+static void merge_into_left(bplus_node_t *left, bplus_node_t *right,
+                            bplus_node_t *parent, usize parent_key_idx)
 {
-        cmemcpy(&left->keys[left->key_count], right->keys,
-                right->key_count * sizeof(bplus_key_t));
-        cmemcpy(&left->leaf.values[left->key_count], right->leaf.values,
-                right->key_count * sizeof(bplus_value_t));
+        if (left->type == NODE_LEAF) {
+                cmemcpy(&left->keys[left->key_count], right->keys,
+                        right->key_count * sizeof(bplus_key_t));
+                cmemcpy(&left->leaf.values[left->key_count], right->leaf.values,
+                        right->key_count * sizeof(bplus_value_t));
+                left->key_count += right->key_count;
+                left->leaf.next = right->leaf.next;
+        } else {
+                left->keys[left->key_count] = parent->keys[parent_key_idx];
+                cmemcpy(&left->keys[left->key_count + 1], right->keys,
+                        right->key_count * sizeof(bplus_key_t));
+                cmemcpy(&left->children[left->key_count + 1], right->children,
+                        (right->key_count + 1) * sizeof(bplus_node_t *));
+                left->key_count += right->key_count + 1;
+        }
 
-        left->key_count += right->key_count;
-        left->leaf.next = right->leaf.next;
-}
+        cmemmove(&parent->keys[parent_key_idx],
+                 &parent->keys[parent_key_idx + 1],
+                 (parent->key_count - parent_key_idx - 1) *
+                         sizeof(bplus_key_t));
+        cmemmove(&parent->children[parent_key_idx + 1],
+                 &parent->children[parent_key_idx + 2],
+                 (parent->key_count - parent_key_idx - 1) *
+                         sizeof(bplus_node_t *));
+        parent->key_count--;
 
-__maybe_unused static void merge_internals(bplus_node_t *left, bplus_key_t key,
-                                           bplus_node_t *right)
-{
-        left->keys[left->key_count] = key;
-        cmemcpy(&left->keys[left->key_count + 1], right->keys,
-                right->key_count * sizeof(bplus_key_t));
-        cmemcpy(&left->children[left->key_count + 1], right->children,
-                (right->key_count + 1) * sizeof(bplus_node_t *));
-
-        left->key_count += right->key_count + 1;
+        cfree(right);
 }
 
 bool bplus_delete(bplus_tree_t *tree, bplus_key_t key)
@@ -433,15 +546,7 @@ bool bplus_delete(bplus_tree_t *tree, bplus_key_t key)
         leaf_remove(leaf, idx);
         tree->count--;
 
-        if (tree->root->key_count == 0) {
-                if (tree->root->type == NODE_INTERNAL) {
-                        bplus_node_t *old_root = tree->root;
-                        tree->root = tree->root->children[0];
-                        cfree(old_root);
-                        tree->height--;
-                } else {
-                }
-        }
+        rebalance_after_delete(tree, leaf);
 
         return true;
 }
