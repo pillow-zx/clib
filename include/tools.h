@@ -2,7 +2,7 @@
 #define __CLIB_TOOLS_H__
 
 #include <types.h>
-#include <port.h>
+#include <compiler.h>
 
 #define CONCAT(a, b) a##b
 
@@ -18,8 +18,8 @@
 #define MASK(n) (BIT(usize, n) - 1)
 #define BITS(x, hi, lo) (((x) >> (lo)) & MASK((hi) - (lo) + 1))
 
-#define MMIO_READ(addr) (*(volatile u32 *)(addr))
-#define MMIO_WRITE(addr, val) (*(volatile u32 *)(addr) = (val))
+#define MMIO_READ(type, addr) (*(volatile type *)(addr))
+#define MMIO_WRITE(type, addr, val) (*(volatile type *)(addr) = (val))
 
 #define MAP(func, ...) func(__VA_ARGS__)
 

@@ -125,6 +125,7 @@ all: lib
 lib: $(STATIC_OBJ) $(SHARED_LIB)
 
 test: $(TEST_BIN)
+	@./test.sh
 
 # Analysis
 # ┌────────────┬────────────────────────┐                                                                         
