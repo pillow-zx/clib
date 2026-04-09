@@ -68,9 +68,8 @@ static __always_inline __must_check i32 stack_push(struct stack *st,
         char *dst = st->buf + (st->top * st->elem_size);
         const char *src = (const char *)elem;
 
-        for (usize i = 0; i < st->elem_size; i++) {
+        for (usize i = 0; i < st->elem_size; i++)
                 dst[i] = src[i];
-        }
 
         st->top++;
         return 0;
@@ -86,9 +85,8 @@ static __always_inline __must_check i32 stack_pop(struct stack *st, void *out)
         char *src = st->buf + (st->top * st->elem_size);
         char *dst = (char *)out;
 
-        for (usize i = 0; i < st->elem_size; i++) {
+        for (usize i = 0; i < st->elem_size; i++)
                 dst[i] = src[i];
-        }
 
         return 0;
 }
@@ -102,9 +100,8 @@ static __always_inline __must_check i32 stack_peek(const struct stack *st,
         const char *src = st->buf + ((st->top - 1) * st->elem_size);
         char *dst = (char *)out;
 
-        for (usize i = 0; i < st->elem_size; i++) {
+        for (usize i = 0; i < st->elem_size; i++)
                 dst[i] = src[i];
-        }
 
         return 0;
 }
