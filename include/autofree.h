@@ -4,11 +4,10 @@
 #include <port.h>
 #include <compiler.h>
 
-static __always_inline void auto_free(void *ptr)
+static __always_inline void auto_free(void **ptr)
 {
-        void **p = (void **)ptr;
-        if (*p)
-                cfree(*p);
+        if (*ptr)
+                cfree(*ptr);
 }
 
 #define autofree __cleanup(auto_free)

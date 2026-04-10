@@ -51,6 +51,7 @@ CC = clang
 
 BUILD ?= debug
 LIBC ?= -DCLIB_USE_LIBC
+CVERSION ?= gnu23
 ifeq ($(BUILD),release)
     CFLAGS := -O3 -DNDEBUG -flto -ffat-lto-objects -march=native
     LDFLAGS := -flto -s
@@ -101,7 +102,8 @@ WARNINGS := -Wall -Wextra -Wshadow -Wformat=2 \
 # │ -std=gnu23 │ GNU C23 标准，支持 typeof、匿名结构体等 │                                                        
 # └────────────┴─────────────────────────────────────────┘   
 
-CFLAGS += $(WARNINGS) -Iinclude -fPIC -std=gnu23 $(LIBC)
+# CFLAGS += $(WARNINGS) -Iinclude -fPIC -std=gnu23 $(LIBC)
+CFLAGS += $(WARNINGS) -Iinclude -std=$(CVERSION) -fPIC $(LIBC)
 
 BUILD_DIR := build
 OBJ_DIR := $(BUILD_DIR)/obj

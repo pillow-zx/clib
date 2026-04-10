@@ -22,9 +22,11 @@
 
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ < 202311L
 #define auto __auto_type
-#define bool _Bool
-#define true 1
-#define false 0
+typedef _Bool bool;
+enum {
+        false = 0,
+        true = 1
+};
 #endif
 
 /* ===========================================================================
