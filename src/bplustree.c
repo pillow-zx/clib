@@ -2,7 +2,7 @@
 #include <bplustree.h>
 #include <compiler.h>
 
-static void insert_to_parent(bplus_tree_t *tree, bplus_node_t *left,
+static bool insert_to_parent(bplus_tree_t *tree, bplus_node_t *left,
                              bplus_key_t key, bplus_node_t *right);
 static void borrow_from_left(bplus_node_t *node, bplus_node_t *parent,
                              usize idx, bplus_node_t *left_sibling);
@@ -116,15 +116,32 @@ bplus_result_t bplus_range_query(const bplus_tree_t *tree, bplus_key_t start,
 
                         if (leaf->keys[i] >= start) {
                                 if (result.count >= result.capacity) {
-                                        result.capacity *= 2;
-                                        result.keys = (bplus_key_t *)crealloc(
-                                                result.keys,
-                                                result.capacity *
-                                                        sizeof(bplus_key_t));
-                                        result.values = (bplus_value_t *)crealloc(
-                                                result.values,
-                                                result.capacity *
-                                                        sizeof(bplus_value_t));
+                                        usize new_capacity =
+                                                result.capacity * 2;
+                                        bplus_key_t *new_keys =
+                                                (bplus_key_t *)crealloc(
+                                                        result.keys,
+                                                        new_capacity *
+                                                                sizeof(bplus_key_t));
+                                        if (unlikely(!new_keys)) {
+                                                bplus_result_free(&result);
+                                                return (bplus_result_t){0};
+                                        }
+
+                                        bplus_value_t *new_values =
+                                                (bplus_value_t *)crealloc(
+                                                        result.values,
+                                                        new_capacity *
+                                                                sizeof(bplus_value_t));
+                                        if (unlikely(!new_values)) {
+                                                cfree(new_keys);
+                                                cfree(result.values);
+                                                return (bplus_result_t){0};
+                                        }
+
+                                        result.keys = new_keys;
+                                        result.values = new_values;
+                                        result.capacity = new_capacity;
                                 }
                                 result.keys[result.count] = leaf->keys[i];
                                 result.values[result.count] =
@@ -206,13 +223,23 @@ static bplus_key_t internal_split(bplus_node_t *left, bplus_node_t *right)
         return split_key;
 }
 
-static void node_split(bplus_tree_t *tree, bplus_node_t *node)
+static bool node_split(bplus_tree_t *tree, bplus_node_t *node)
 {
+        bool is_root = node == tree->root;
         bplus_node_t *right = node_create(node->type);
+        bplus_node_t *new_root = nullptr;
         bplus_key_t split_key;
 
         if (unlikely(!right))
-                return;
+                return false;
+
+        if (is_root) {
+                new_root = node_create(NODE_INTERNAL);
+                if (unlikely(!new_root)) {
+                        cfree(right);
+                        return false;
+                }
+        }
 
         if (node->type == NODE_LEAF)
                 split_key = leaf_split(node, right);
@@ -221,10 +248,25 @@ static void node_split(bplus_tree_t *tree, bplus_node_t *node)
         else
                 unreachable();
 
-        insert_to_parent(tree, node, split_key, right);
+        if (is_root) {
+                new_root->keys[0] = split_key;
+                new_root->children[0] = node;
+                new_root->children[1] = right;
+                new_root->key_count = 1;
+                tree->root = new_root;
+                tree->height++;
+                return true;
+        }
+
+        if (unlikely(!insert_to_parent(tree, node, split_key, right))) {
+                cfree(right);
+                return false;
+        }
+
+        return true;
 }
 
-static void insert_non_full(bplus_tree_t *tree, bplus_node_t *node,
+static bool insert_non_full(bplus_tree_t *tree, bplus_node_t *node,
                             bplus_key_t key, bplus_value_t value)
 {
         usize idx = binary_search(node->keys, node->key_count, key);
@@ -232,10 +274,11 @@ static void insert_non_full(bplus_tree_t *tree, bplus_node_t *node,
         if (node->type == NODE_LEAF) {
                 if (idx < node->key_count && node->keys[idx] == key) {
                         node->leaf.values[idx] = value;
-                        return;
+                        return true;
                 }
                 node_insert_key(node, idx, key, value, nullptr);
                 tree->count++;
+                return true;
         } else if (node->type == NODE_INTERNAL) {
                 if (idx < node->key_count && key >= node->keys[idx])
                         idx++;
@@ -243,31 +286,36 @@ static void insert_non_full(bplus_tree_t *tree, bplus_node_t *node,
                 bplus_node_t *child = node->children[idx];
 
                 if (node_is_full(child)) {
-                        node_split(tree, child);
+                        if (unlikely(!node_split(tree, child)))
+                                return false;
 
                         if (key >= node->keys[idx])
                                 idx++;
 
                         child = node->children[idx];
                 }
-                insert_non_full(tree, child, key, value);
+                return insert_non_full(tree, child, key, value);
         } else {
                 unreachable();
         }
+
+        return false;
 }
 
-static void insert_to_parent(bplus_tree_t *tree, bplus_node_t *left,
+static bool insert_to_parent(bplus_tree_t *tree, bplus_node_t *left,
                              bplus_key_t key, bplus_node_t *right)
 {
         if (left == tree->root) {
                 bplus_node_t *new_root = node_create(NODE_INTERNAL);
+                if (unlikely(!new_root))
+                        return false;
                 new_root->keys[0] = key;
                 new_root->children[0] = left;
                 new_root->children[1] = right;
                 new_root->key_count = 1;
                 tree->root = new_root;
                 tree->height++;
-                return;
+                return true;
         }
 
         bplus_node_t *path[32];
@@ -284,7 +332,7 @@ static void insert_to_parent(bplus_tree_t *tree, bplus_node_t *left,
         }
 
         if (unlikely(path_len == 0))
-                return;
+                return false;
 
         bplus_node_t *parent = path[path_len - 1];
 
@@ -293,25 +341,24 @@ static void insert_to_parent(bplus_tree_t *tree, bplus_node_t *left,
                 idx++;
         }
 
-        if (node_is_full(parent)) {
-                cmemmove(&parent->keys[idx + 1], &parent->keys[idx],
-                         (parent->key_count - idx) * sizeof(bplus_key_t));
-                cmemmove(&parent->children[idx + 2], &parent->children[idx + 1],
-                         (parent->key_count - idx) * sizeof(bplus_node_t *));
-                parent->keys[idx] = key;
-                parent->children[idx + 1] = right;
-                parent->key_count++;
+        if (unlikely(idx > parent->key_count))
+                return false;
 
-                node_split(tree, parent);
-        } else {
-                cmemmove(&parent->keys[idx + 1], &parent->keys[idx],
-                         (parent->key_count - idx) * sizeof(bplus_key_t));
-                cmemmove(&parent->children[idx + 2], &parent->children[idx + 1],
-                         (parent->key_count - idx) * sizeof(bplus_node_t *));
-                parent->keys[idx] = key;
-                parent->children[idx + 1] = right;
-                parent->key_count++;
+        if (node_is_full(parent)) {
+                if (unlikely(!node_split(tree, parent)))
+                        return false;
+                return insert_to_parent(tree, left, key, right);
         }
+
+        cmemmove(&parent->keys[idx + 1], &parent->keys[idx],
+                 (parent->key_count - idx) * sizeof(bplus_key_t));
+        cmemmove(&parent->children[idx + 2], &parent->children[idx + 1],
+                 (parent->key_count - idx) * sizeof(bplus_node_t *));
+        parent->keys[idx] = key;
+        parent->children[idx + 1] = right;
+        parent->key_count++;
+
+        return true;
 }
 
 bool bplus_insert(bplus_tree_t *tree, bplus_key_t key, bplus_value_t value)
@@ -334,11 +381,11 @@ bool bplus_insert(bplus_tree_t *tree, bplus_key_t key, bplus_value_t value)
                 new_root->children[0] = tree->root;
                 tree->root = new_root;
                 tree->height++;
-                node_split(tree, new_root->children[0]);
+                if (unlikely(!node_split(tree, new_root->children[0])))
+                        return false;
         }
 
-        insert_non_full(tree, tree->root, key, value);
-        return true;
+        return insert_non_full(tree, tree->root, key, value);
 }
 
 static void leaf_remove(bplus_node_t *leaf, usize idx)
