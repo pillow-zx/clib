@@ -1,6 +1,5 @@
 #include <assert.h>
 #include <bplustree.h>
-#include <stdio.h>
 #include "test.h"
 
 static void test_bplustree_range_query_results(void)
@@ -31,6 +30,6 @@ static void test_bplustree_range_query_results(void)
 int main(void)
 {
         RUN_TEST(test_bplustree_range_query_results);
-        puts("All B+ tree range tests passed!");
-        return 0;
+        TEST_SUMMARY();
+        return TEST_EXIT_CODE();
 }

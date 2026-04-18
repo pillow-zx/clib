@@ -91,7 +91,7 @@ __pure             // 纯函数（可读全局状态，无副作用）
 __const            // 常量函数（仅依赖参数，不读全局）
 __malloc           // 返回值为新分配的内存指针
 __hot / __cold     // 热路径 / 冷路径优化提示
-__likely(x) / __unlikely(x)  // 分支预测提示
+likely(x) / unlikely(x)      // 分支预测提示
 __printf(fmt, args)          // printf 格式检查
 __nonnull(...)               // 参数非空检查
 __weak             // 弱符号，允许用户覆盖实现
@@ -331,6 +331,13 @@ MMIO_WRITE(type, addr, val) // 写 type 长度寄存器
 
 // 容器指针
 container_of(ptr, type, member)  // 由成员指针获取外层结构体指针
+
+// 类型检测
+typecheck(type, x) // 检查类型是否正确
+
+// 获得最大/最小值
+max(a, b)       // 获得a, b中的最大值
+min(a, b)       // 获得a, b中的最小值
 ```
 
 ---

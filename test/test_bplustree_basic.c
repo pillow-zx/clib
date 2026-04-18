@@ -1,6 +1,5 @@
 #include <bplustree.h>
 #include <assert.h>
-#include <stdio.h>
 #include "test.h"
 
 static void test_bplustree_basic_create_insert_search_count(void)
@@ -28,6 +27,6 @@ static void test_bplustree_basic_create_insert_search_count(void)
 int main(void)
 {
         RUN_TEST(test_bplustree_basic_create_insert_search_count);
-        puts("All B+ tree basic tests passed!");
-        return 0;
+        TEST_SUMMARY();
+        return TEST_EXIT_CODE();
 }

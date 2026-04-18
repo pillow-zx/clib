@@ -1,5 +1,4 @@
 #include <ringbuf.h>
-#include <stdio.h>
 #include <string.h>
 #include "test.h"
 
@@ -172,7 +171,6 @@ int main(void)
         RUN_TEST(test_free_space);
         RUN_TEST(test_reset);
         RUN_TEST(test_macro_init);
-
-        printf("All ringbuf tests passed!\n");
-        return 0;
+        TEST_SUMMARY();
+        return TEST_EXIT_CODE();
 }

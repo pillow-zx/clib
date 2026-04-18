@@ -1,6 +1,5 @@
 #include <bplustree.h>
 #include <assert.h>
-#include <stdio.h>
 #include "test.h"
 
 static void test_bplustree_extended_empty_tree_and_invalid_ops(void)
@@ -122,7 +121,6 @@ int main(void)
         RUN_TEST(test_bplustree_extended_insert_search_update_delete);
         RUN_TEST(test_bplustree_extended_large_dataset_range_queries);
         RUN_TEST(test_bplustree_extended_null_tree_api_guards);
-
-        printf("All B+ tree extended tests passed!\n");
-        return 0;
+        TEST_SUMMARY();
+        return TEST_EXIT_CODE();
 }

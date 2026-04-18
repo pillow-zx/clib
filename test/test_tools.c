@@ -1,5 +1,4 @@
 #include <assert.h>
-#include <stdio.h>
 #include <stdint.h>
 #include <tools.h>
 #include "test.h"
@@ -135,7 +134,6 @@ int main(void)
         RUN_TEST(test_tools_min_max_macros);
         RUN_TEST(test_tools_container_of_macro);
         RUN_TEST(test_tools_map_macro);
-
-        printf("All tools tests passed!\n");
-        return 0;
+        TEST_SUMMARY();
+        return TEST_EXIT_CODE();
 }

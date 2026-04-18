@@ -35,15 +35,15 @@ static void node_destroy(bplus_node_t *node)
 static usize binary_search(const bplus_key_t *keys, usize count,
                            bplus_key_t key)
 {
-    usize left = 0, right = count;
-    while (left < right) {
-        usize mid = left + (right - left) / 2;
-        if (keys[mid] < key)
-            left = mid + 1;
-        else
-            right = mid;
-    }
-    return left;
+        usize left = 0, right = count;
+        while (left < right) {
+                usize mid = left + (right - left) / 2;
+                if (keys[mid] < key)
+                        left = mid + 1;
+                else
+                        right = mid;
+        }
+        return left;
 }
 
 static bplus_value_t leaf_search(const bplus_node_t *leaf, bplus_key_t key)

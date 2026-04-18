@@ -1,5 +1,4 @@
 #include <list.h>
-#include <stdio.h>
 #include <assert.h>
 #include <tools.h>
 #include "test.h"
@@ -161,7 +160,6 @@ int main(void)
         RUN_TEST(test_list_safe_iteration_delete);
         RUN_TEST(test_list_entry_iteration_macros);
         RUN_TEST(test_list_is_head_check);
-
-        printf("All list tests passed!\n");
-        return 0;
+        TEST_SUMMARY();
+        return TEST_EXIT_CODE();
 }

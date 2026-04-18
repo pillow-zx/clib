@@ -122,7 +122,6 @@ int main(void)
         RUN_TEST(test_rbtree_insert_and_search);
         RUN_TEST(test_rbtree_order_traversal);
         RUN_TEST(test_rbtree_erase_single_node);
-
-        printf("All rbtree tests passed!\n");
-        return 0;
+        TEST_SUMMARY();
+        return TEST_EXIT_CODE();
 }

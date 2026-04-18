@@ -1,5 +1,4 @@
 #include <stack.h>
-#include <stdio.h>
 #include <string.h>
 #include "test.h"
 
@@ -139,7 +138,6 @@ int main(void)
         RUN_TEST(test_macro_define);
         RUN_TEST(test_struct_elements);
         RUN_TEST(test_reset);
-
-        printf("All stack tests passed!\n");
-        return 0;
+        TEST_SUMMARY();
+        return TEST_EXIT_CODE();
 }

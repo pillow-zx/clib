@@ -63,7 +63,6 @@ int main(void)
         RUN_TEST(test_debug_log_level_str_macro);
         RUN_TEST(test_debug_static_assert_macro);
         RUN_TEST(test_debug_print_macros);
-
-        printf("All debug tests passed!\n");
-        return 0;
+        TEST_SUMMARY();
+        return TEST_EXIT_CODE();
 }

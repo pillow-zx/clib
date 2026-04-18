@@ -1,6 +1,5 @@
 #include <bplustree.h>
 #include <assert.h>
-#include <stdio.h>
 #include "test.h"
 
 static void test_bplustree_delete_rebalance_borrow_from_right(void)
@@ -154,7 +153,6 @@ int main(void)
         RUN_TEST(test_bplustree_delete_rebalance_merge);
         RUN_TEST(test_bplustree_delete_root_collapse);
         RUN_TEST(test_bplustree_delete_alternating_pattern);
-
-        printf("All B+ tree delete rebalance tests passed!\n");
-        return 0;
+        TEST_SUMMARY();
+        return TEST_EXIT_CODE();
 }

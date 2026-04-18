@@ -1,6 +1,5 @@
 #include <dsu.h>
 #include <assert.h>
-#include <stdio.h>
 #include "test.h"
 
 #define N 10
@@ -83,7 +82,6 @@ int main(void)
         RUN_TEST(test_dsu_union_and_connectivity);
         RUN_TEST(test_dsu_root_and_count);
         RUN_TEST(test_dsu_chain_union);
-
-        printf("All DSU tests passed!\n");
-        return 0;
+        TEST_SUMMARY();
+        return TEST_EXIT_CODE();
 }

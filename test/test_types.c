@@ -1,7 +1,6 @@
 #include <types.h>
 #include <assert.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <string.h>
 #include "test.h"
 
@@ -81,7 +80,6 @@ int main(void)
         RUN_TEST(test_types_signed_integers);
         RUN_TEST(test_types_floats);
         RUN_TEST(test_types_boolean_and_aliases);
-
-        printf("All types tests passed!\n");
-        return 0;
+        TEST_SUMMARY();
+        return TEST_EXIT_CODE();
 }
