@@ -39,102 +39,102 @@
         })
 #endif
 
-static __always_inline i16 max_i16(i16 a, i16 b)
+static inline i16 max_i16(i16 a, i16 b)
 {
         return a > b ? a : b;
 }
 
-static __always_inline i32 max_i32(i32 a, i32 b)
+static inline i32 max_i32(i32 a, i32 b)
 {
         return a > b ? a : b;
 }
 
-static __always_inline i64 max_i64(i64 a, i64 b)
+static inline i64 max_i64(i64 a, i64 b)
 {
         return a > b ? a : b;
 }
 
-static __always_inline f32 max_f32(f32 a, f32 b)
+static inline f32 max_f32(f32 a, f32 b)
 {
         return a > b ? a : b;
 }
 
-static __always_inline f64 max_f64(f64 a, f64 b)
+static inline f64 max_f64(f64 a, f64 b)
 {
         return a > b ? a : b;
 }
 
-static __always_inline u16 max_u16(u16 a, u16 b)
+static inline u16 max_u16(u16 a, u16 b)
 {
         return a > b ? a : b;
 }
 
-static __always_inline u32 max_u32(u32 a, u32 b)
+static inline u32 max_u32(u32 a, u32 b)
 {
         return a > b ? a : b;
 }
 
-static __always_inline u64 max_u64(u64 a, u64 b)
+static inline u64 max_u64(u64 a, u64 b)
 {
         return a > b ? a : b;
 }
 
-static __always_inline usize max_usize(usize a, usize b)
+static inline usize max_usize(usize a, usize b)
 {
         return a > b ? a : b;
 }
 
-static __always_inline isize max_isize(isize a, isize b)
+static inline isize max_isize(isize a, isize b)
 {
         return a > b ? a : b;
 }
 
-static __always_inline i16 min_i16(i16 a, i16 b)
+static inline i16 min_i16(i16 a, i16 b)
 {
         return a < b ? a : b;
 }
 
-static __always_inline i32 min_i32(i32 a, i32 b)
+static inline i32 min_i32(i32 a, i32 b)
 {
         return a < b ? a : b;
 }
 
-static __always_inline i64 min_i64(i64 a, i64 b)
+static inline i64 min_i64(i64 a, i64 b)
 {
         return a < b ? a : b;
 }
 
-static __always_inline f32 min_f32(f32 a, f32 b)
+static inline f32 min_f32(f32 a, f32 b)
 {
         return a < b ? a : b;
 }
 
-static __always_inline f64 min_f64(f64 a, f64 b)
+static inline f64 min_f64(f64 a, f64 b)
 {
         return a < b ? a : b;
 }
 
-static __always_inline u16 min_u16(u16 a, u16 b)
+static inline u16 min_u16(u16 a, u16 b)
 {
         return a < b ? a : b;
 }
 
-static __always_inline u32 min_u32(u32 a, u32 b)
+static inline u32 min_u32(u32 a, u32 b)
 {
         return a < b ? a : b;
 }
 
-static __always_inline u64 min_u64(u64 a, u64 b)
+static inline u64 min_u64(u64 a, u64 b)
 {
         return a < b ? a : b;
 }
 
-static __always_inline usize min_usize(usize a, usize b)
+static inline usize min_usize(usize a, usize b)
 {
         return a < b ? a : b;
 }
 
-static __always_inline isize min_isize(isize a, isize b)
+static inline isize min_isize(isize a, isize b)
 {
         return a < b ? a : b;
 }

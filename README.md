@@ -16,8 +16,8 @@
 ┌──────────────────────────────────────────────────────────────────┐
 │                            应用层                                │
 ├──────────────────────────────────────────────────────────────────┤
-│  list.h  │  rbtree.h  │  bplustree.h  │  dsu.h  │  ringbuf.h     │
-├──────────┴────────────┴───────────────┴─────────┴────────────────┤
+│ list.h │ rbtree.h │ bplustree.h │ dsu.h │ fifo.h │ ringbuf.h     │
+├────────┴──────────┴─────────────┴───────┴────────┴───────────────┤
 │                    编译器抽象层 (compiler.h)                     │
 ├──────────────────────────────────────────────────────────────────┤
 │                     平台抽象层 (port.h)                          │
@@ -43,11 +43,13 @@ clib/
 │   ├── rbtree.h       # 红黑树
 │   ├── bplustree.h    # B+ 树
 │   ├── dsu.h          # 并查集
+│   ├── fifo.h         # 泛型 FIFO 队列
 │   ├── stack.h        # 栈
 │   └── ringbuf.h      # 环形缓冲区
 ├── src/
 │   ├── rbtree.c       # 红黑树平衡算法实现
-│   └── bplustree.c    # B+ 树完整实现
+│   ├── bplustree.c    # B+ 树完整实现
+│   └── fifo.c         # FIFO 队列实现
 ├── test/              # 测试用例（11 个套件）
 ├── Makefile
 └── README.md
@@ -256,6 +258,41 @@ i32 root = dsu_find_iterative(&dsu, x); // 迭代版（路径压缩）
 
 ---
 
+### `fifo.h` — 泛型 FIFO 队列
+
+固定容量、元素大小可配置的 FIFO 队列，支持单元素和批量读写：
+
+```c
+int buffer[8];
+struct fifo q;
+fifo_init(&q, buffer, sizeof(buffer[0]), 8);
+// 或使用宏定义：
+// FIFO_DEFINE(q, int, 8);
+
+// 单元素操作：成功返回 0，失败返回 -1（满/空）
+int v = 42, out = 0;
+fifo_push(&q, &v);
+fifo_peek(&q, &out);   // 只读队头，不出队
+fifo_pop(&q, &out);    // 读并出队
+
+// 批量操作：返回实际写入/读取的元素个数
+int in[] = {1, 2, 3, 4};
+int outv[4];
+usize nwrite = fifo_write(&q, in, 4);
+usize nread  = fifo_read(&q, outv, 4);
+
+// 状态查询
+bool  empty = fifo_empty(&q);
+bool  full  = fifo_full(&q);
+usize size  = fifo_size(&q);
+usize cap   = fifo_capacity(&q);
+
+// 重置（清空队列）
+fifo_reset(&q);
+```
+
+---
+
 ### `ringbuf.h` — 环形缓冲区
 
 固定大小的环形缓冲区，适用于生产者-消费者和流式数据场景：
@@ -299,13 +336,16 @@ ringbuf_reset(&rb);
 #define LOGLEVEL INFO   // 只输出 INFO 及以上级别
 
 // 日志级别（数值从低到高）
-// ALL(0) < TRACE(1) < DEBUG(3) < INFO(2) < ERROR(4)
+// ALL(0) < TRACE(1) < DEBUG(2) < INFO(3) < NOTICE(4) < WARNING(5) < ERROR(6)
 
 print(INFO,  "module", "count = %d", count);       // 不换行
+println(NOTICE, "cfg", "using default profile");   // 换行
+println(WARNING, "io", "retrying write operation"); // 换行
 println(ERROR, "net", "connection failed: %s", msg); // 换行
 ```
 
 输出格式：`[LEVEL][place][file:line func] message`，按级别着色显示。
+颜色映射：`ERROR=RED`、`WARNING=YELLOW`、`NOTICE=CYAN`、`INFO=GREEN`、`DEBUG=BLUE`、`TRACE=MAGENTA`。
 
 ---
 
@@ -314,7 +354,9 @@ println(ERROR, "net", "connection failed: %s", msg); // 换行
 ```c
 // 位操作
 BIT(u32, 5)           // (u32)(1 << 5)
-BITS_U8(n)            // u8 位掩码
+BITS_U8(n)            // 8 位掩码
+BITS_U32(n)           // 32 位掩码
+BITS_U64(n)           // 64 位掩码
 BIT_SET(x, n)         // 置位第 n 位
 BIT_CLR(x, n)         // 清除第 n 位
 BIT_FLIP(x, n)        // 翻转第 n 位
