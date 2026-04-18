@@ -479,7 +479,7 @@
 #endif
 
 /**
- * @def __likely(x)
+ * @def likely(x)
  * @brief Hints that condition is likely to be true
  *
  * Helps compiler optimize branch prediction. Use for conditions that
@@ -490,7 +490,7 @@
  *
  * Example:
  * @code
- * if (__likely(ptr != NULL)) {
+ * if (likely(ptr != NULL)) {
  *     // Normal case - optimized as fall-through
  * } else {
  *     // Rare case - may be moved out of line
@@ -502,7 +502,7 @@
 #endif
 
 /**
- * @def __unlikely(x)
+ * @def unlikely(x)
  * @brief Hints that condition is likely to be false
  *
  * Helps compiler optimize branch prediction. Use for error conditions
@@ -513,7 +513,7 @@
  *
  * Example:
  * @code
- * if (__unlikely(error_occurred)) {
+ * if (unlikely(error_occurred)) {
  *     // Error handling - moved out of hot path
  *     handle_error();
  * }

@@ -5,10 +5,12 @@
 
 static void test_debug_log_levels(void)
 {
-        ASSERT(ERROR == 4);
-        ASSERT(DEBUG == 3);
-        ASSERT(INFO == 2);
+        ASSERT(ERROR == 6);
+        ASSERT(WARNING == 5);
+        ASSERT(NOTICE == 4);
+        ASSERT(INFO == 3);
         ASSERT(TRACE == 1);
+        ASSERT(DEBUG == 2);
         ASSERT(ALL == 0);
 }
 
@@ -24,15 +26,19 @@ static void test_debug_ansi_colors(void)
 static void test_debug_log_color_macro(void)
 {
         ASSERT(strcmp(LOG_COLOR(ERROR), ANSI_FG_RED) == 0);
+        ASSERT(strcmp(LOG_COLOR(WARNING), ANSI_FG_YELLOW) == 0);
+        ASSERT(strcmp(LOG_COLOR(NOTICE), ANSI_FG_CYAN) == 0);
         ASSERT(strcmp(LOG_COLOR(INFO), ANSI_FG_GREEN) == 0);
-        ASSERT(strcmp(LOG_COLOR(DEBUG), ANSI_FG_YELLOW) == 0);
-        ASSERT(strcmp(LOG_COLOR(TRACE), ANSI_FG_BLUE) == 0);
+        ASSERT(strcmp(LOG_COLOR(DEBUG), ANSI_FG_BLUE) == 0);
+        ASSERT(strcmp(LOG_COLOR(TRACE), ANSI_FG_MAGENTA) == 0);
         ASSERT(strcmp(LOG_COLOR(999), ANSI_NONE) == 0);
 }
 
 static void test_debug_log_level_str_macro(void)
 {
         ASSERT(strcmp(LOG_LEVEL_STR(ERROR), "ERROR") == 0);
+        ASSERT(strcmp(LOG_LEVEL_STR(WARNING), "WARNING") == 0);
+        ASSERT(strcmp(LOG_LEVEL_STR(NOTICE), "NOTICE") == 0);
         ASSERT(strcmp(LOG_LEVEL_STR(INFO), "INFO") == 0);
         ASSERT(strcmp(LOG_LEVEL_STR(DEBUG), "DEBUG") == 0);
         ASSERT(strcmp(LOG_LEVEL_STR(TRACE), "TRACE") == 0);
@@ -49,6 +55,8 @@ static void test_debug_print_macros(void)
 {
         print(ERROR, "TEST", "print without newline");
         printf("\n");
+        println(WARNING, "TEST", "warning with newline");
+        println(NOTICE, "TEST", "notice with newline");
         println(TRACE, "TEST", "println with newline");
         print(INFO, "TEST", "value: %d", 42);
         printf("\n");

@@ -21,11 +21,13 @@
 #define ANSI_BG_WHITE "\33[1;47m"
 #define ANSI_NONE "\33[0m"
 
-#define ERROR 4
-#define DEBUG 3
-#define INFO 2
-#define TRACE 1
 #define ALL 0
+#define TRACE 1
+#define DEBUG 2
+#define INFO 3
+#define NOTICE 4
+#define WARNING 5
+#define ERROR 6
 
 #ifndef LOGLEVEL
 #define LOGLEVEL ALL
@@ -40,18 +42,22 @@
         } while (0)
 
 #define LOG_COLOR(level)                                                       \
-        ((level) == ERROR   ? ANSI_FG_RED                                      \
-         : (level) == INFO  ? ANSI_FG_GREEN                                    \
-         : (level) == DEBUG ? ANSI_FG_YELLOW                                   \
-         : (level) == TRACE ? ANSI_FG_BLUE                                     \
-                            : ANSI_NONE)
+        ((level) == ERROR     ? ANSI_FG_RED                                    \
+         : (level) == WARNING ? ANSI_FG_YELLOW                                 \
+         : (level) == NOTICE  ? ANSI_FG_CYAN                                   \
+         : (level) == INFO    ? ANSI_FG_GREEN                                  \
+         : (level) == DEBUG   ? ANSI_FG_BLUE                                   \
+         : (level) == TRACE   ? ANSI_FG_MAGENTA                                \
+                              : ANSI_NONE)
 
 #define LOG_LEVEL_STR(level)                                                   \
-        ((level) == ERROR   ? "ERROR"                                          \
-         : (level) == INFO  ? "INFO"                                           \
-         : (level) == DEBUG ? "DEBUG"                                          \
-         : (level) == TRACE ? "TRACE"                                          \
-                            : "UNK")
+        ((level) == ERROR     ? "ERROR"                                        \
+         : (level) == WARNING ? "WARNING"                                      \
+         : (level) == NOTICE  ? "NOTICE"                                       \
+         : (level) == INFO    ? "INFO"                                         \
+         : (level) == DEBUG   ? "DEBUG"                                        \
+         : (level) == TRACE   ? "TRACE"                                        \
+                              : "UNK")
 
 #define print(level, place, format, ...)                                       \
         do {                                                                   \
