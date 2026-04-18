@@ -14,7 +14,7 @@ static void merge_into_left(bplus_node_t *left, bplus_node_t *right,
 static bplus_node_t *node_create(node_type_t type)
 {
         bplus_node_t *node = (bplus_node_t *)ccalloc(1, sizeof(bplus_node_t));
-        if (__unlikely(!node))
+        if (unlikely(!node))
                 return nullptr;
         node->type = type;
         node->key_count = 0;
@@ -23,7 +23,7 @@ static bplus_node_t *node_create(node_type_t type)
 
 static void node_destroy(bplus_node_t *node)
 {
-        if (__unlikely(!node))
+        if (unlikely(!node))
                 return;
         if (node->type == NODE_INTERNAL) {
                 for (usize i = 0; i <= node->key_count; i++)
@@ -57,7 +57,7 @@ static bplus_value_t leaf_search(const bplus_node_t *leaf, bplus_key_t key)
 
 bplus_value_t bplus_search(const bplus_tree_t *tree, bplus_key_t key)
 {
-        if (__unlikely(!tree || !tree->root))
+        if (unlikely(!tree || !tree->root))
                 return nullptr;
 
         bplus_node_t *node = tree->root;
@@ -74,7 +74,7 @@ bplus_value_t bplus_search(const bplus_tree_t *tree, bplus_key_t key)
 
 bplus_node_t *bplus_find_leaf(const bplus_tree_t *tree, bplus_key_t key)
 {
-        if (__unlikely(!tree || !tree->root))
+        if (unlikely(!tree || !tree->root))
                 return nullptr;
 
         bplus_node_t *node = tree->root;
@@ -93,14 +93,14 @@ bplus_result_t bplus_range_query(const bplus_tree_t *tree, bplus_key_t start,
 {
         bplus_result_t result = {0};
 
-        if (__unlikely(!tree || !tree->first_leaf))
+        if (unlikely(!tree || !tree->first_leaf))
                 return result;
 
         usize capacity = 64;
         result.keys = (bplus_key_t *)cmalloc(capacity * sizeof(bplus_key_t));
         result.values =
                 (bplus_value_t *)cmalloc(capacity * sizeof(bplus_value_t));
-        if (__unlikely(!result.keys || !result.values)) {
+        if (unlikely(!result.keys || !result.values)) {
                 cfree(result.keys);
                 cfree(result.values);
                 return (bplus_result_t){0};
@@ -211,7 +211,7 @@ static void node_split(bplus_tree_t *tree, bplus_node_t *node)
         bplus_node_t *right = node_create(node->type);
         bplus_key_t split_key;
 
-        if (__unlikely(!right))
+        if (unlikely(!right))
                 return;
 
         if (node->type == NODE_LEAF)
@@ -283,7 +283,7 @@ static void insert_to_parent(bplus_tree_t *tree, bplus_node_t *left,
                 node = node->children[idx];
         }
 
-        if (__unlikely(path_len == 0))
+        if (unlikely(path_len == 0))
                 return;
 
         bplus_node_t *parent = path[path_len - 1];
@@ -316,12 +316,12 @@ static void insert_to_parent(bplus_tree_t *tree, bplus_node_t *left,
 
 bool bplus_insert(bplus_tree_t *tree, bplus_key_t key, bplus_value_t value)
 {
-        if (__unlikely(!tree))
+        if (unlikely(!tree))
                 return false;
 
         if (!tree->root) {
                 tree->root = node_create(NODE_LEAF);
-                if (__unlikely(!tree->root))
+                if (unlikely(!tree->root))
                         return false;
                 tree->first_leaf = tree->root;
                 tree->height = 1;
@@ -329,7 +329,7 @@ bool bplus_insert(bplus_tree_t *tree, bplus_key_t key, bplus_value_t value)
 
         if (node_is_full(tree->root)) {
                 bplus_node_t *new_root = node_create(NODE_INTERNAL);
-                if (__unlikely(!new_root))
+                if (unlikely(!new_root))
                         return false;
                 new_root->children[0] = tree->root;
                 tree->root = new_root;
@@ -525,11 +525,11 @@ static void merge_into_left(bplus_node_t *left, bplus_node_t *right,
 
 bool bplus_delete(bplus_tree_t *tree, bplus_key_t key)
 {
-        if (__unlikely(!tree || !tree->root))
+        if (unlikely(!tree || !tree->root))
                 return false;
 
         bplus_node_t *leaf = bplus_find_leaf(tree, key);
-        if (__unlikely(!leaf))
+        if (unlikely(!leaf))
                 return false;
 
         usize idx = binary_search(leaf->keys, leaf->key_count, key);
@@ -547,7 +547,7 @@ bool bplus_delete(bplus_tree_t *tree, bplus_key_t key)
 bplus_tree_t *bplus_create(void)
 {
         bplus_tree_t *tree = (bplus_tree_t *)ccalloc(1, sizeof(bplus_tree_t));
-        if (__unlikely(!tree))
+        if (unlikely(!tree))
                 return nullptr;
 
         tree->root = nullptr;
@@ -560,7 +560,7 @@ bplus_tree_t *bplus_create(void)
 
 void bplus_destroy(bplus_tree_t *tree)
 {
-        if (__unlikely(!tree))
+        if (unlikely(!tree))
                 return;
         node_destroy(tree->root);
         cfree(tree);

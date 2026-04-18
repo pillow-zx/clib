@@ -23,10 +23,7 @@
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ < 202311L
 #define auto __auto_type
 typedef _Bool bool;
-enum {
-        false = 0,
-        true = 1
-};
+enum { false = 0, true = 1 };
 #endif
 
 /* ===========================================================================
@@ -56,7 +53,6 @@ typedef signed long long i64;
 
 typedef float f32;
 typedef double f64;
-
 /* ===========================================================================
  * Pointer-Sized Integer Types
  * ===========================================================================

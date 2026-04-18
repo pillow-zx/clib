@@ -497,8 +497,8 @@
  * }
  * @endcode
  */
-#ifndef __likely
-#define __likely(x) __builtin_expect(!!(x), 1)
+#ifndef likely
+#define likely(x) __builtin_expect(!!(x), 1)
 #endif
 
 /**
@@ -519,8 +519,8 @@
  * }
  * @endcode
  */
-#ifndef __unlikely
-#define __unlikely(x) __builtin_expect(!!(x), 0)
+#ifndef unlikely
+#define unlikely(x) __builtin_expect(!!(x), 0)
 #endif
 
 /**

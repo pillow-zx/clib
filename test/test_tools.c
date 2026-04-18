@@ -9,6 +9,26 @@ static int sum(int a, int b, int c)
         return a + b + c;
 }
 
+static void test_tools_likely_unlikely_macros(void)
+{
+        ASSERT(likely(1) == 1);
+        ASSERT(likely(0) == 0);
+        ASSERT(unlikely(1) == 1);
+        ASSERT(unlikely(0) == 0);
+}
+
+static void test_tools_concat_macros(void)
+{
+#define CAT_NAME my_var
+#define my_var 123
+        ASSERT(CONCAT(my_, var) == 123);
+
+#define CAT3_PREFIX pre_
+#define CAT3_MID fix_
+#define pre_fix_suffix 456
+        ASSERT(CONCAT3(CAT3_PREFIX, CAT3_MID, suffix) == 456);
+}
+
 static void test_tools_bits_macros(void)
 {
         ASSERT(BITS_U8(0) == 0x01);
@@ -31,6 +51,48 @@ static void test_tools_arrlen_macro(void)
 
         char str[] = "hello";
         ASSERT(ARRLEN(str) == 6);
+}
+
+static void test_tools_typecheck_macro(void)
+{
+        i32 i = 1;
+        usize u = 2;
+
+        ASSERT(typecheck(i32, i));
+        ASSERT(typecheck(usize, u));
+}
+
+static void test_tools_min_max_macros(void)
+{
+        ASSERT(min((i16)-3, (i16)7) == (i16)-3);
+        ASSERT(max((i16)-3, (i16)7) == (i16)7);
+
+        ASSERT(min((i32)-10, (i32)5) == (i32)-10);
+        ASSERT(max((i32)-10, (i32)5) == (i32)5);
+
+        ASSERT(min((i64)-100, (i64)-99) == (i64)-100);
+        ASSERT(max((i64)-100, (i64)-99) == (i64)-99);
+
+        ASSERT(min((u16)9, (u16)3) == (u16)3);
+        ASSERT(max((u16)9, (u16)3) == (u16)9);
+
+        ASSERT(min((u32)100, (u32)101) == (u32)100);
+        ASSERT(max((u32)100, (u32)101) == (u32)101);
+
+        ASSERT(min((u64)1000, (u64)999) == (u64)999);
+        ASSERT(max((u64)1000, (u64)999) == (u64)1000);
+
+        ASSERT(min((isize)-8, (isize)-2) == (isize)-8);
+        ASSERT(max((isize)-8, (isize)-2) == (isize)-2);
+
+        ASSERT(min((usize)8, (usize)2) == (usize)2);
+        ASSERT(max((usize)8, (usize)2) == (usize)8);
+
+        ASSERT(min((f32)1.5f, (f32)1.25f) == (f32)1.25f);
+        ASSERT(max((f32)1.5f, (f32)1.25f) == (f32)1.5f);
+
+        ASSERT(min((f64)2.5, (f64)3.5) == (f64)2.5);
+        ASSERT(max((f64)2.5, (f64)3.5) == (f64)3.5);
 }
 
 static void test_tools_container_of_macro(void)
@@ -65,8 +127,12 @@ static void test_tools_map_macro(void)
 
 int main(void)
 {
+        RUN_TEST(test_tools_likely_unlikely_macros);
+        RUN_TEST(test_tools_concat_macros);
         RUN_TEST(test_tools_bits_macros);
         RUN_TEST(test_tools_arrlen_macro);
+        RUN_TEST(test_tools_typecheck_macro);
+        RUN_TEST(test_tools_min_max_macros);
         RUN_TEST(test_tools_container_of_macro);
         RUN_TEST(test_tools_map_macro);
 
