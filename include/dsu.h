@@ -25,9 +25,9 @@ static __always_inline void dsu_init(struct dsu *dsu, i32 *parent_mem,
 
 static __must_check i32 dsu_find(struct dsu *dsu, i32 x)
 {
-        if (dsu->parent[x] != x) {
+        if (dsu->parent[x] != x)
                 dsu->parent[x] = dsu_find(dsu, dsu->parent[x]);
-        }
+
         return dsu->parent[x];
 }
 
@@ -35,9 +35,9 @@ static __always_inline __must_check i32 dsu_find_iterative(struct dsu *dsu,
                                                            i32 x)
 {
         i32 root = x;
-        while (dsu->parent[root] != root) {
+        while (dsu->parent[root] != root)
                 root = dsu->parent[root];
-        }
+
         while (dsu->parent[x] != root) {
                 i32 next = dsu->parent[x];
                 dsu->parent[x] = root;
@@ -54,11 +54,11 @@ static __always_inline void dsu_union(struct dsu *dsu, i32 x, i32 y)
         if (rootX == rootY)
                 return;
 
-        if (dsu->rank[rootX] < dsu->rank[rootY]) {
+        if (dsu->rank[rootX] < dsu->rank[rootY])
                 dsu->parent[rootX] = rootY;
-        } else if (dsu->rank[rootX] > dsu->rank[rootY]) {
+        else if (dsu->rank[rootX] > dsu->rank[rootY])
                 dsu->parent[rootY] = rootX;
-        } else {
+        else {
                 dsu->parent[rootY] = rootX;
                 ++dsu->rank[rootX];
         }

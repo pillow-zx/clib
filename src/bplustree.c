@@ -295,9 +295,8 @@ static bool insert_non_full(bplus_tree_t *tree, bplus_node_t *node,
                         child = node->children[idx];
                 }
                 return insert_non_full(tree, child, key, value);
-        } else {
+        } else
                 unreachable();
-        }
 
         return false;
 }
@@ -337,9 +336,8 @@ static bool insert_to_parent(bplus_tree_t *tree, bplus_node_t *left,
         bplus_node_t *parent = path[path_len - 1];
 
         usize idx = 0;
-        while (idx <= parent->key_count && parent->children[idx] != left) {
+        while (idx <= parent->key_count && parent->children[idx] != left)
                 idx++;
-        }
 
         if (unlikely(idx > parent->key_count))
                 return false;
