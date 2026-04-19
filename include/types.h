@@ -9,8 +9,8 @@
  * @date 2024
  */
 
-#ifndef __CLIB_TYPES_H__
-#define __CLIB_TYPES_H__
+#ifndef CLIB_TYPES_H
+#define CLIB_TYPES_H
 
 /* ===========================================================================
  * C23 Compatibility

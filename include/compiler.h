@@ -12,8 +12,8 @@
  * @date 2026
  */
 
-#ifndef __CLIB_COMPILER_H__
-#define __CLIB_COMPILER_H__
+#ifndef CLIB_COMPILER_H
+#define CLIB_COMPILER_H
 
 /**
  * @defgroup inlining Inlining Control Attributes

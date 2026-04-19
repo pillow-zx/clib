@@ -1,5 +1,5 @@
-#ifndef __CLIB_VEC_H__
-#define __CLIB_VEC_H__
+#ifndef CLIB_VEC_H
+#define CLIB_VEC_H
 
 #include <compiler.h>
 #include <types.h>
@@ -61,9 +61,9 @@ vec_push(struct vector *vec, const void *elem);
 __must_check __nonnull((1, 2)) i32 vec_pop(struct vector *vec, void *out);
 
 __must_check __nonnull((1, 2)) usize
-vec_write(struct vector *vec, const void *elem, const usize sz);
+vec_write(struct vector *vec, const void *elem, usize sz);
 
 __must_check __nonnull((1, 2)) usize
-vec_read(struct vector *vec, void *data, const usize sz);
+vec_read(struct vector *vec, void *data, usize sz);
 
 #endif // !__CLIB_VEC_H__

@@ -1,5 +1,5 @@
-#ifndef __CLIB_DSU_H__
-#define __CLIB_DSU_H__
+#ifndef CLIB_DSU_H
+#define CLIB_DSU_H
 
 #include <types.h>
 #include <compiler.h>

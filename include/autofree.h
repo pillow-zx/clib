@@ -1,5 +1,5 @@
-#ifndef __CLIB_AUTOFREE_H__
-#define __CLIB_AUTOFREE_H__
+#ifndef CLIB_AUTOFREE_H
+#define CLIB_AUTOFREE_H
 
 #include <port.h>
 #include <compiler.h>

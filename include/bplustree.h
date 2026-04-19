@@ -1,8 +1,7 @@
-#ifndef __CLIB_BPLUSTREE_H__
-#define __CLIB_BPLUSTREE_H__
+#ifndef CLIB_BPLUSTREE_H
+#define CLIB_BPLUSTREE_H
 
 #include <types.h>
-#include <compiler.h>
 
 #define BPLUS_ORDER 64
 

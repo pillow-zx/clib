@@ -1,5 +1,5 @@
-#ifndef __CLIB_STACK_H__
-#define __CLIB_STACK_H__
+#ifndef CLIB_STACK_H
+#define CLIB_STACK_H
 
 #include <types.h>
 #include <compiler.h>
@@ -22,7 +22,7 @@ struct stack {
         struct stack name = STACK_INIT(name##_storage, sizeof(type), (cap))
 
 static __always_inline void stack_init(struct stack *st, void *buf,
-                                       usize elem_sz, usize cap)
+                                       const usize elem_sz, const usize cap)
 {
         st->buf = (char *)buf;
         st->elem_size = elem_sz;
@@ -65,8 +65,8 @@ static __always_inline __must_check i32 stack_push(struct stack *st,
         if (stack_full(st))
                 return -1;
 
-        char *dst = st->buf + (st->top * st->elem_size);
-        const char *src = (const char *)elem;
+        char *dst = st->buf + st->top * st->elem_size;
+        const char *src = elem;
 
         for (usize i = 0; i < st->elem_size; i++)
                 dst[i] = src[i];
@@ -82,8 +82,8 @@ static __always_inline __must_check i32 stack_pop(struct stack *st, void *out)
 
         st->top--;
 
-        char *src = st->buf + (st->top * st->elem_size);
-        char *dst = (char *)out;
+        const char *src = st->buf + st->top * st->elem_size;
+        char *dst = out;
 
         for (usize i = 0; i < st->elem_size; i++)
                 dst[i] = src[i];
@@ -97,8 +97,8 @@ static __always_inline __must_check i32 stack_peek(const struct stack *st,
         if (stack_empty(st))
                 return -1;
 
-        const char *src = st->buf + ((st->top - 1) * st->elem_size);
-        char *dst = (char *)out;
+        const char *src = st->buf + (st->top - 1) * st->elem_size;
+        char *dst = out;
 
         for (usize i = 0; i < st->elem_size; i++)
                 dst[i] = src[i];

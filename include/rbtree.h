@@ -1,7 +1,6 @@
-#ifndef __CLIB_RBTREE_H__
-#define __CLIB_RBTREE_H__
+#ifndef CLIB_RBTREE_H
+#define CLIB_RBTREE_H
 
-#include <port.h>
 #include <types.h>
 #include <compiler.h>
 #include <tools.h>

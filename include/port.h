@@ -14,8 +14,8 @@
  * @date 2026
  */
 
-#ifndef __CLIB_PORT_H__
-#define __CLIB_PORT_H__
+#ifndef CLIB_PORT_H
+#define CLIB_PORT_H
 
 #include <types.h>
 #include <compiler.h>
@@ -35,7 +35,7 @@
  * @param size Number of bytes to allocate
  * @return Pointer to allocated memory, or NULL on failure
  */
-void *cmalloc(usize size);
+void *cmalloc(const usize size);
 
 /**
  * @brief Allocate and zero-initialize array
@@ -43,7 +43,7 @@ void *cmalloc(usize size);
  * @param size Size of each element
  * @return Pointer to allocated memory, or NULL on failure
  */
-void *ccalloc(usize num, usize size);
+void *ccalloc(const usize num, const usize size);
 
 /**
  * @brief Reallocate memory block
@@ -51,7 +51,7 @@ void *ccalloc(usize num, usize size);
  * @param size New size in bytes
  * @return Pointer to reallocated memory, or NULL on failure
  */
-void *crealloc(void *ptr, usize size);
+void *crealloc(void *ptr, const usize size);
 
 /**
  * @brief Free memory block
@@ -68,7 +68,7 @@ void cfree(void *ptr);
  *
  * @note Behavior is undefined if regions overlap (use cmemmove for that)
  */
-void *cmemcpy(void *dest, const void *src, usize size);
+void *cmemcpy(void *dest, const void *src, const usize size);
 
 /**
  * @brief Copy memory region (handles overlapping regions)
@@ -77,7 +77,7 @@ void *cmemcpy(void *dest, const void *src, usize size);
  * @param size Number of bytes to copy
  * @return Pointer to dest
  */
-void *cmemmove(void *dest, const void *src, usize size);
+void *cmemmove(void *dest, const void *src, const usize size);
 
 /**
  * @brief Set memory region to a value
@@ -86,7 +86,7 @@ void *cmemmove(void *dest, const void *src, usize size);
  * @param size Number of bytes to set
  * @return Pointer to dest
  */
-void *cmemset(void *dest, int value, usize size);
+void *cmemset(void *dest, const int value, const usize size);
 
 /**
  * @brief Compare two memory regions
@@ -95,7 +95,7 @@ void *cmemset(void *dest, int value, usize size);
  * @param size Number of bytes to compare
  * @return 0 if equal, <0 if s1 < s2, >0 if s1 > s2
  */
-int cmemcmp(const void *s1, const void *s2, usize size);
+int cmemcmp(const void *s1, const void *s2, const usize size);
 
 /** @} */
 
@@ -130,17 +130,17 @@ __printf(1, 2) int cprintf(const char *fmt, ...);
 #include <stdlib.h>
 #include <string.h>
 
-__weak void *cmalloc(usize size)
+__weak void *cmalloc(const usize size)
 {
         return malloc(size);
 }
 
-__weak void *ccalloc(usize num, usize size)
+__weak void *ccalloc(const usize num, const usize size)
 {
         return calloc(num, size);
 }
 
-__weak void *crealloc(void *ptr, usize size)
+__weak void *crealloc(void *ptr, const usize size)
 {
         return realloc(ptr, size);
 }
@@ -150,22 +150,22 @@ __weak void cfree(void *ptr)
         free(ptr);
 }
 
-__weak void *cmemcpy(void *dest, const void *src, usize size)
+__weak void *cmemcpy(void *dest, const void *src, const usize size)
 {
         return memcpy(dest, src, size);
 }
 
-__weak void *cmemmove(void *dest, const void *src, usize size)
+__weak void *cmemmove(void *dest, const void *src, const usize size)
 {
         return memmove(dest, src, size);
 }
 
-__weak void *cmemset(void *dest, int value, usize size)
+__weak void *cmemset(void *dest, const int value, const usize size)
 {
         return memset(dest, value, size);
 }
 
-__weak int cmemcmp(const void *s1, const void *s2, usize size)
+__weak int cmemcmp(const void *s1, const void *s2, const usize size)
 {
         return memcmp(s1, s2, size);
 }

@@ -1,5 +1,5 @@
-#ifndef __CLIB_TOOLS_H__
-#define __CLIB_TOOLS_H__
+#ifndef CLIB_TOOLS_H
+#define CLIB_TOOLS_H
 
 #include <types.h>
 #include <compiler.h>
@@ -39,102 +39,102 @@
         })
 #endif
 
-static inline i16 max_i16(i16 a, i16 b)
+static inline i16 max_i16(const i16 a, const i16 b)
 {
         return a > b ? a : b;
 }
 
-static inline i32 max_i32(i32 a, i32 b)
+static inline i32 max_i32(const i32 a, const i32 b)
 {
         return a > b ? a : b;
 }
 
-static inline i64 max_i64(i64 a, i64 b)
+static inline i64 max_i64(const i64 a, const i64 b)
 {
         return a > b ? a : b;
 }
 
-static inline f32 max_f32(f32 a, f32 b)
+static inline f32 max_f32(const f32 a, const f32 b)
 {
         return a > b ? a : b;
 }
 
-static inline f64 max_f64(f64 a, f64 b)
+static inline f64 max_f64(const f64 a, const f64 b)
 {
         return a > b ? a : b;
 }
 
-static inline u16 max_u16(u16 a, u16 b)
+static inline u16 max_u16(const u16 a, const u16 b)
 {
         return a > b ? a : b;
 }
 
-static inline u32 max_u32(u32 a, u32 b)
+static inline u32 max_u32(const u32 a, const u32 b)
 {
         return a > b ? a : b;
 }
 
-static inline u64 max_u64(u64 a, u64 b)
+static inline u64 max_u64(const u64 a, const u64 b)
 {
         return a > b ? a : b;
 }
 
-static inline usize max_usize(usize a, usize b)
+static inline usize max_usize(const usize a, const usize b)
 {
         return a > b ? a : b;
 }
 
-static inline isize max_isize(isize a, isize b)
+static inline isize max_isize(const isize a, const isize b)
 {
         return a > b ? a : b;
 }
 
-static inline i16 min_i16(i16 a, i16 b)
+static inline i16 min_i16(const i16 a, const i16 b)
 {
         return a < b ? a : b;
 }
 
-static inline i32 min_i32(i32 a, i32 b)
+static inline i32 min_i32(const i32 a, const i32 b)
 {
         return a < b ? a : b;
 }
 
-static inline i64 min_i64(i64 a, i64 b)
+static inline i64 min_i64(const i64 a, const i64 b)
 {
         return a < b ? a : b;
 }
 
-static inline f32 min_f32(f32 a, f32 b)
+static inline f32 min_f32(const f32 a, const f32 b)
 {
         return a < b ? a : b;
 }
 
-static inline f64 min_f64(f64 a, f64 b)
+static inline f64 min_f64(const f64 a, const f64 b)
 {
         return a < b ? a : b;
 }
 
-static inline u16 min_u16(u16 a, u16 b)
+static inline u16 min_u16(const u16 a, const u16 b)
 {
         return a < b ? a : b;
 }
 
-static inline u32 min_u32(u32 a, u32 b)
+static inline u32 min_u32(const u32 a, const u32 b)
 {
         return a < b ? a : b;
 }
 
-static inline u64 min_u64(u64 a, u64 b)
+static inline u64 min_u64(const u64 a, const u64 b)
 {
         return a < b ? a : b;
 }
 
-static inline usize min_usize(usize a, usize b)
+static inline usize min_usize(const usize a, const usize b)
 {
         return a < b ? a : b;
 }
 
-static inline isize min_isize(isize a, isize b)
+static inline isize min_isize(const isize a, const isize b)
 {
         return a < b ? a : b;
 }

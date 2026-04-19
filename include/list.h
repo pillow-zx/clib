@@ -1,10 +1,9 @@
-#ifndef __CLIB_LIST_H__
-#define __CLIB_LIST_H__
+#ifndef CLIB_LIST_H
+#define CLIB_LIST_H
 
 #include <types.h>
 #include <port.h>
 #include <compiler.h>
-#include <tools.h>
 
 struct list_head {
         struct list_head *prev;

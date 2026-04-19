@@ -1,5 +1,5 @@
-#ifndef __CLIB_DEBUG_H__
-#define __CLIB_DEBUG_H__
+#ifndef CLIB_DEBUG_H
+#define CLIB_DEBUG_H
 
 #include <port.h>
 

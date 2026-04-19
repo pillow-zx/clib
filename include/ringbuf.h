@@ -1,5 +1,5 @@
-#ifndef __CLIB_RINGBUF_H__
-#define __CLIB_RINGBUF_H__
+#ifndef CLIB_RINGBUF_H
+#define CLIB_RINGBUF_H
 
 #include <types.h>
 #include <compiler.h>

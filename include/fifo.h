@@ -1,5 +1,5 @@
-#ifndef __CLIB_FIFO_H__
-#define __CLIB_FIFO_H__
+#ifndef CLIB_FIFO_H
+#define CLIB_FIFO_H
 
 #include <types.h>
 #include <compiler.h>
