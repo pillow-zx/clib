@@ -56,14 +56,14 @@ static __always_inline void vec_reset(struct vector *vec)
 }
 
 __must_check __nonnull((1, 2)) i32
-        vec_push(struct vector *vec, const void *elem);
+vec_push(struct vector *vec, const void *elem);
 
 __must_check __nonnull((1, 2)) i32 vec_pop(struct vector *vec, void *out);
 
 __must_check __nonnull((1, 2)) usize
-        vec_write(struct vector *vec, const void *elem, usize sz);
+vec_write(struct vector *vec, const void *elem, const usize sz);
 
 __must_check __nonnull((1, 2)) usize
-        vec_read(struct vector *vec, void *data, usize sz);
+vec_read(struct vector *vec, void *data, const usize sz);
 
 #endif // !__CLIB_VEC_H__

@@ -98,7 +98,7 @@ usize vec_write(struct vector *vec, const void *elem, const usize sz)
         return sz;
 }
 
-usize vec_read(struct vector *vec, void *data, usize sz)
+usize vec_read(struct vector *vec, void *data, const usize sz)
 {
         if (unlikely(vec_invalid(vec) || sz == 0))
                 return 0;

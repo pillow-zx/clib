@@ -26,7 +26,7 @@ struct fifo {
         struct fifo name = FIFO_INIT(name##_storage, sizeof(type), (cap))
 
 static __always_inline __nonnull((1, 2)) void
-fifo_init(struct fifo *q, void *buf, usize elem_size, usize cap)
+fifo_init(struct fifo *q, void *buf, const usize elem_size, const usize cap)
 {
         q->buf = (char *)buf;
         q->elem_size = elem_size;
@@ -74,9 +74,9 @@ __must_check __nonnull((1, 2)) i32 fifo_pop(struct fifo *q, void *out);
 __must_check __nonnull((1, 2)) i32 fifo_peek(const struct fifo *q, void *out);
 
 __must_check __nonnull((1, 2)) usize
-fifo_write(struct fifo *q, const void *data, usize count);
+fifo_write(struct fifo *q, const void *data, const usize count);
 
 __must_check __nonnull((1, 2)) usize
-fifo_read(struct fifo *q, void *data, usize count);
+fifo_read(struct fifo *q, void *data, const usize count);
 
 #endif /* __CLIB_FIFO_H__ */

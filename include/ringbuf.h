@@ -55,7 +55,7 @@ ringbuf_free(const struct ringbuf *rb)
 
 static __always_inline __must_check usize ringbuf_write(struct ringbuf *rb,
                                                         const void *data,
-                                                        usize len)
+                                                        const usize len)
 {
         usize free_space = ringbuf_free(rb);
         usize write_len = len > free_space ? free_space : len;
@@ -70,7 +70,8 @@ static __always_inline __must_check usize ringbuf_write(struct ringbuf *rb,
 }
 
 static __always_inline __must_check usize ringbuf_read(struct ringbuf *rb,
-                                                       void *data, usize len)
+                                                       void *data,
+                                                       const usize len)
 {
         usize used = ringbuf_used(rb);
         usize read_len = len > used ? used : len;
@@ -85,7 +86,7 @@ static __always_inline __must_check usize ringbuf_read(struct ringbuf *rb,
 }
 
 static __always_inline __must_check i32 ringbuf_write_byte(struct ringbuf *rb,
-                                                           char byte)
+                                                           const char byte)
 {
         if (ringbuf_full(rb))
                 return -1;
@@ -121,7 +122,8 @@ static __always_inline void ringbuf_reset(struct ringbuf *rb)
 }
 
 static __always_inline __must_check usize ringbuf_peek(const struct ringbuf *rb,
-                                                       void *data, usize len)
+                                                       void *data,
+                                                       const usize len)
 {
         usize used = ringbuf_used(rb);
         usize peek_len = len > used ? used : len;
@@ -137,7 +139,7 @@ static __always_inline __must_check usize ringbuf_peek(const struct ringbuf *rb,
 }
 
 static __always_inline __must_check usize ringbuf_skip(struct ringbuf *rb,
-                                                       usize len)
+                                                       const usize len)
 {
         usize used = ringbuf_used(rb);
         usize skip_len = len > used ? used : len;
