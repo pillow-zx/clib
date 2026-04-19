@@ -2,6 +2,7 @@
 #define CLIB_BPLUSTREE_H
 
 #include <types.h>
+#include <compiler.h>
 
 #define BPLUS_ORDER 64
 

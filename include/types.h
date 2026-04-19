@@ -20,10 +20,13 @@
  * ===========================================================================
  */
 
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ < 202311L
+/* Nullptr compatibility for pre-C23 */
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 202311L
+#define nullptr ((void *)0)
 #define auto __auto_type
 typedef _Bool bool;
 enum { false = 0, true = 1 };
+#define typeof(x) __typeof__(x)
 #endif
 
 /* ===========================================================================
@@ -84,10 +87,5 @@ typedef __PTRDIFF_TYPE__ isize;
  */
 
 typedef unsigned char uchar;
-
-/* Nullptr compatibility for pre-C23 */
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 202311L
-#define nullptr ((void *)0)
-#endif
 
 #endif /* __CLIB_TYPES_H__ */

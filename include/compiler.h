@@ -578,6 +578,10 @@
 #define offsetof(t, d) __builtin_offsetof(t, d)
 #endif
 
+#ifndef types_compatible
+#define types_compatible(a, b) __builtin_types_compatible_p(typeof(a), typeof(b))
+#endif
+
 /** @} */ // end of optimization group
 
 /**

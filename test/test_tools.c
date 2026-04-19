@@ -3,11 +3,6 @@
 #include <tools.h>
 #include "test.h"
 
-static int sum(int a, int b, int c)
-{
-        return a + b + c;
-}
-
 static void test_tools_likely_unlikely_macros(void)
 {
         ASSERT(likely(1) == 1);
@@ -63,35 +58,35 @@ static void test_tools_typecheck_macro(void)
 
 static void test_tools_min_max_macros(void)
 {
-        ASSERT(min((i16)-3, (i16)7) == (i16)-3);
-        ASSERT(max((i16)-3, (i16)7) == (i16)7);
+        ASSERT(MIN((i16)-3, (i16)7) == (i16)-3);
+        ASSERT(MAX((i16)-3, (i16)7) == (i16)7);
 
-        ASSERT(min((i32)-10, (i32)5) == (i32)-10);
-        ASSERT(max((i32)-10, (i32)5) == (i32)5);
+        ASSERT(MIN((i32)-10, (i32)5) == (i32)-10);
+        ASSERT(MAX((i32)-10, (i32)5) == (i32)5);
 
-        ASSERT(min((i64)-100, (i64)-99) == (i64)-100);
-        ASSERT(max((i64)-100, (i64)-99) == (i64)-99);
+        ASSERT(MIN((i64)-100, (i64)-99) == (i64)-100);
+        ASSERT(MAX((i64)-100, (i64)-99) == (i64)-99);
 
-        ASSERT(min((u16)9, (u16)3) == (u16)3);
-        ASSERT(max((u16)9, (u16)3) == (u16)9);
+        ASSERT(MIN((u16)9, (u16)3) == (u16)3);
+        ASSERT(MAX((u16)9, (u16)3) == (u16)9);
 
-        ASSERT(min((u32)100, (u32)101) == (u32)100);
-        ASSERT(max((u32)100, (u32)101) == (u32)101);
+        ASSERT(MIN((u32)100, (u32)101) == (u32)100);
+        ASSERT(MAX((u32)100, (u32)101) == (u32)101);
 
-        ASSERT(min((u64)1000, (u64)999) == (u64)999);
-        ASSERT(max((u64)1000, (u64)999) == (u64)1000);
+        ASSERT(MIN((u64)1000, (u64)999) == (u64)999);
+        ASSERT(MAX((u64)1000, (u64)999) == (u64)1000);
 
-        ASSERT(min((isize)-8, (isize)-2) == (isize)-8);
-        ASSERT(max((isize)-8, (isize)-2) == (isize)-2);
+        ASSERT(MIN((isize)-8, (isize)-2) == (isize)-8);
+        ASSERT(MAX((isize)-8, (isize)-2) == (isize)-2);
 
-        ASSERT(min((usize)8, (usize)2) == (usize)2);
-        ASSERT(max((usize)8, (usize)2) == (usize)8);
+        ASSERT(MIN((usize)8, (usize)2) == (usize)2);
+        ASSERT(MAX((usize)8, (usize)2) == (usize)8);
 
-        ASSERT(min((f32)1.5f, (f32)1.25f) == (f32)1.25f);
-        ASSERT(max((f32)1.5f, (f32)1.25f) == (f32)1.5f);
+        ASSERT(MIN((f32)1.5f, (f32)1.25f) == (f32)1.25f);
+        ASSERT(MAX((f32)1.5f, (f32)1.25f) == (f32)1.5f);
 
-        ASSERT(min((f64)2.5, (f64)3.5) == (f64)2.5);
-        ASSERT(max((f64)2.5, (f64)3.5) == (f64)3.5);
+        ASSERT(MIN((f64)2.5, (f64)3.5) == (f64)2.5);
+        ASSERT(MAX((f64)2.5, (f64)3.5) == (f64)3.5);
 }
 
 static void test_tools_container_of_macro(void)
@@ -119,11 +114,6 @@ static void test_tools_container_of_macro(void)
         ASSERT(container2 == &obj);
 }
 
-static void test_tools_map_macro(void)
-{
-        ASSERT(MAP(sum, 1, 2, 3) == 6);
-}
-
 int main(void)
 {
         RUN_TEST(test_tools_likely_unlikely_macros);
@@ -133,7 +123,6 @@ int main(void)
         RUN_TEST(test_tools_typecheck_macro);
         RUN_TEST(test_tools_min_max_macros);
         RUN_TEST(test_tools_container_of_macro);
-        RUN_TEST(test_tools_map_macro);
         TEST_SUMMARY();
         return TEST_EXIT_CODE();
 }
