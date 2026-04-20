@@ -87,5 +87,6 @@ typedef __PTRDIFF_TYPE__ isize;
  */
 
 typedef unsigned char uchar;
+typedef signed char schar;
 
 #endif /* __CLIB_TYPES_H__ */

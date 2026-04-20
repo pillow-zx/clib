@@ -111,6 +111,7 @@ TEST_DIR := test
 TEST_BUILD_DIR := $(BUILD_DIR)/test
 
 SRC := $(wildcard src/*.c)
+HDR := $(wildcard include/*.h)
 OBJ := $(patsubst src/%.c,$(OBJ_DIR)/%.o,$(SRC))
 DEPS := $(OBJ:.o=.d)
 
@@ -155,6 +156,12 @@ analysis:
 		$(CFLAGS) \
 		-Xanalyzer -analyzer-checker=core,nullability,unix \
 		$(src);)
+	$(foreach hdr,$(HDR), \
+		clang --analyze \
+		$(CFLAGS) \
+		-Xanalyzer -analyzer-checker=core,nullability,unix \
+		-include $(hdr) \
+		-x c /dev/null;)
 
 format:
 	find . -name '*.c' -o -name '*.h' | xargs clang-format -i
@@ -178,3 +185,4 @@ $(BUILD_DIR) $(OBJ_DIR) $(TEST_BUILD_DIR):
 
 clean:
 	rm -rf $(BUILD_DIR)
+	rm -f ./*.plist

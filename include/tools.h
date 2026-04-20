@@ -29,16 +29,15 @@
 #define MMIO_WRITE(type, addr, val) (*(volatile type *)(addr) = (val))
 
 #define typesame(a, b) _Generic((a), typeof(b): 1, default: 0)
+#define typecheck(type, x) _Generic((x), type: 1, default: 0)
+
+#define ISARR(arr, msg) static_assert(!types_compatible((arr), &(arr)[0]), msg)
 
 #define ARRLEN(arr)                                                            \
         ({                                                                     \
-                static_assert(!types_compatible((arr), &(arr)[0]),             \
-                              "ARRLEN: argument must be an array, "            \
-                              "not a pointer");                                \
+                ISARR(arr, "ARRLEN: argument must be an array, not a pointer"); \
                 sizeof((arr)) / sizeof((arr)[0]);                              \
         })
-
-#define typecheck(type, x) _Generic((x), type: 1, default: 0)
 
 #define MAX(a, b)                                                              \
         ({                                                                     \
