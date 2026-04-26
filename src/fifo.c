@@ -2,7 +2,8 @@
 #include <port.h>
 #include <compiler.h>
 
-static __always_inline __must_check __pure bool fifo_invalid(const struct fifo *q)
+static __always_inline __must_check __pure bool
+fifo_invalid(const struct fifo *q)
 {
         return !q || !q->buf || q->elem_size == 0 || q->capacity == 0;
 }

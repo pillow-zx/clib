@@ -35,7 +35,8 @@
 
 #define ARRLEN(arr)                                                            \
         ({                                                                     \
-                ISARR(arr, "ARRLEN: argument must be an array, not a pointer"); \
+                ISARR(arr,                                                     \
+                      "ARRLEN: argument must be an array, not a pointer");     \
                 sizeof((arr)) / sizeof((arr)[0]);                              \
         })
 
