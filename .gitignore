@@ -1,9 +1,11 @@
 *
 !include/
+!include/compiler/
 !test/
 !src/
 
 !include/*.h
+!include/compiler/*.h
 !test/*.h
 !test/*.c
 !src/*.c
