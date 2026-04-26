@@ -114,6 +114,44 @@ static void test_tools_container_of_macro(void)
         ASSERT(container2 == &obj);
 }
 
+static void test_tools_constexpr_macro(void)
+{
+        ASSERT(constexpr(1 + 2) == 3);
+        ASSERT(constexpr(10 * 3) == 30);
+        ASSERT(constexpr(sizeof(int)) > 0);
+
+        enum { VAL = 100 };
+        ASSERT(constexpr(VAL) == 100);
+
+        ASSERT(constexpr(constant_p(42)) == 1);
+}
+
+static void test_tools_constexpr_if_macro(void)
+{
+        ASSERT(constexpr_if(1, 10, 20) == 10);
+        ASSERT(constexpr_if(0, 10, 20) == 20);
+
+        ASSERT(constexpr_if(sizeof(int) >= 4, 1, 0) == 1);
+        ASSERT(constexpr_if(sizeof(char) == 1, 1, 0) == 1);
+
+        ASSERT(constexpr_if(1, constexpr_if(0, 100, 200), 300) == 200);
+
+        int x = constexpr_if(1, 42, "not_an_int");
+        ASSERT(x == 42);
+}
+
+static void test_tools_constexpr_val_macro(void)
+{
+        ASSERT(constexpr_val(42, 0) == 42);
+        ASSERT(constexpr_val(sizeof(int), 0) > 0);
+
+        int x = 123;
+        ASSERT(constexpr_val(x, 999) == 999);
+
+        enum { TEN = 10 };
+        ASSERT(constexpr_val(TEN, 0) == 10);
+}
+
 int main(void)
 {
         RUN_TEST(test_tools_likely_unlikely_macros);
@@ -123,6 +161,9 @@ int main(void)
         RUN_TEST(test_tools_typecheck_macro);
         RUN_TEST(test_tools_min_max_macros);
         RUN_TEST(test_tools_container_of_macro);
+        RUN_TEST(test_tools_constexpr_macro);
+        RUN_TEST(test_tools_constexpr_if_macro);
+        RUN_TEST(test_tools_constexpr_val_macro);
         TEST_SUMMARY();
         return TEST_EXIT_CODE();
 }

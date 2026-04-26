@@ -68,4 +68,18 @@
         })
 #endif
 
+#define constexpr(expr)                                                        \
+        ({                                                                     \
+                static_assert(constant_p(expr),                                \
+                              "constexpr: requires a compile-time constant "   \
+                              "expression");                                   \
+                (expr);                                                        \
+        })
+
+#define constexpr_if(const_expr, true_expr, false_expr)                       \
+        choose_expr(const_expr, true_expr, false_expr)
+
+#define constexpr_val(expr, fallback)                                          \
+        choose_expr(constant_p(expr), (expr), (fallback))
+
 #endif
