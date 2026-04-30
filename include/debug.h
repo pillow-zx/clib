@@ -37,7 +37,7 @@
 
 #define _Log(level, ...)                                                       \
         do {                                                                   \
-                if (level >= LOGLEVEL)                                         \
+                if ((level) >= LOGLEVEL)                                       \
                         cprintf(__VA_ARGS__);                                  \
         } while (0)
 
@@ -59,19 +59,26 @@
          : (level) == TRACE   ? "TRACE"                                        \
                               : "UNK")
 
-#define print(level, place, format, ...)                                       \
+#define print(level, format, ...)                                              \
         do {                                                                   \
-                _Log(level, ANSI_FMT("[%s][%s][%s:%d %s] " format),            \
-                     LOG_COLOR((level)), LOG_LEVEL_STR((level)), place,        \
-                     __FILE__, __LINE__, __func__, ##__VA_ARGS__);             \
+                _Log(level, ANSI_FMT("[%s][%s:%d %s] " format),                \
+                     LOG_COLOR((level)), LOG_LEVEL_STR((level)), __FILE__,     \
+                     __LINE__, __func__, ##__VA_ARGS__);                       \
         } while (0)
 
-#define println(level, place, format, ...)                                     \
+#define println(level, format, ...)                                            \
         do {                                                                   \
-                _Log(level, ANSI_FMT("[%s][%s][%s:%d %s] " format "\n"),       \
-                     LOG_COLOR((level)), LOG_LEVEL_STR((level)), place,        \
-                     __FILE__, __LINE__, __func__, ##__VA_ARGS__);             \
+                _Log(level, ANSI_FMT("[%s][%s:%d %s] " format "\n"),           \
+                     LOG_COLOR((level)), LOG_LEVEL_STR((level)), __FILE__,     \
+                     __LINE__, __func__, ##__VA_ARGS__);                       \
         } while (0)
+
+#define error(format, ...) print(ERROR, format, ##__VA_ARGS__)
+#define warn(format, ...) print(WARNING, format, ##__VA_ARGS__)
+#define notice(format, ...) print(NOTICE, format, ##__VA_ARGS__)
+#define info(format, ...) print(INFO, format, ##__VA_ARGS__)
+#define debug(format, ...) print(DEBUG, format, ##__VA_ARGS__)
+#define trace(format, ...) print(TRACE, format, ##__VA_ARGS__)
 
 #ifndef static_assert
 #define static_assert(cond, msg) _Static_assert(cond, msg)

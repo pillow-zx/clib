@@ -70,7 +70,8 @@
 #define __pure __attribute__((__pure__))
 #endif
 
-/** @brief 常量函数：仅依赖参数值，不访问全局状态，无副作用。比 __pure 约束更强。 */
+/** @brief 常量函数：仅依赖参数值，不访问全局状态，无副作用。比 __pure
+ * 约束更强。 */
 #ifndef __const
 #define __const __attribute__((__const__))
 #endif

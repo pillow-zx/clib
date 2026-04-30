@@ -53,14 +53,24 @@ static void test_debug_static_assert_macro(void)
 
 static void test_debug_print_macros(void)
 {
-        print(ERROR, "TEST", "print without newline");
+        print(ERROR, "print without newline");
         printf("\n");
-        println(WARNING, "TEST", "warning with newline");
-        println(NOTICE, "TEST", "notice with newline");
-        println(TRACE, "TEST", "println with newline");
-        print(INFO, "TEST", "value: %d", 42);
+        println(WARNING, "warning with newline");
+        println(NOTICE, "notice with newline");
+        println(TRACE, "println with newline");
+        print(INFO, "value: %d", 42);
         printf("\n");
-        println(DEBUG, "TEST", "mixed: %s=%d", "answer", 42);
+        println(DEBUG, "mixed: %s=%d", "answer", 42);
+}
+
+static void test_debug_other_macros(void)
+{
+        error("error\n");
+        warn("warning\n");
+        notice("notice\n");
+        info("info\n");
+        debug("debug\n");
+        trace("trace\n");
 }
 
 int main(void)
@@ -71,6 +81,8 @@ int main(void)
         RUN_TEST(test_debug_log_level_str_macro);
         RUN_TEST(test_debug_static_assert_macro);
         RUN_TEST(test_debug_print_macros);
+        RUN_TEST(test_debug_other_macros);
+
         TEST_SUMMARY();
         return TEST_EXIT_CODE();
 }

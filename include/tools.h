@@ -76,7 +76,7 @@
                 (expr);                                                        \
         })
 
-#define constexpr_if(const_expr, true_expr, false_expr)                       \
+#define constexpr_if(const_expr, true_expr, false_expr)                        \
         choose_expr(const_expr, true_expr, false_expr)
 
 #define constexpr_val(expr, fallback)                                          \

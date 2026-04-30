@@ -40,10 +40,11 @@
 #define constant_p(exp) __builtin_constant_p(exp)
 #endif
 
-/** @brief 编译期三元选择：const_exp 非零返回 exp1，否则返回 exp2；未被选中的分支不被求值。 */
+/** @brief 编译期三元选择：const_exp 非零返回 exp1，否则返回
+ * exp2；未被选中的分支不被求值。 */
 #ifndef choose_expr
-#define choose_expr(const_exp, exp1, exp2) \
-	__builtin_choose_expr(const_exp, exp1, exp2)
+#define choose_expr(const_exp, exp1, exp2)                                     \
+        __builtin_choose_expr(const_exp, exp1, exp2)
 #endif
 
 /** @brief 向编译器承诺 expr 为真，帮助消除死代码并优化路径。
