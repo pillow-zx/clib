@@ -8,23 +8,6 @@
 #define CONCAT(a, b) _CONCAT(a, b)
 #define CONCAT3(a, b, c) CONCAT(CONCAT(a, b), c)
 
-#define BIT(type, n) ((type)(1) << (n))
-#define BITS_U8(n) BIT(u8, n)
-#define BITS_U32(n) BIT(u32, n)
-#define BITS_U64(n) BIT(u64, n)
-#define BIT_SET(x, n) ((x) |= BIT(typeof(x), n))
-#define BIT_CLR(x, n) ((x) &= ~BIT(typeof(x), n))
-#define BIT_FLIP(x, n) ((x) ^= BIT(typeof(x), n))
-#define BIT_TEST(x, n) (!!((x) & BIT(typeof(x), n)))
-
-#define MASK(n) (BIT(usize, n) - 1)
-#define BITS(x, hi, lo)                                                        \
-        ({                                                                     \
-                static_assert((hi) >= (lo), "BITS: hi must be >= lo");         \
-                static_assert((lo) >= 0, "BITS: lo must be >= 0");             \
-                (((x) >> (lo)) & MASK((hi) - (lo) + 1));                       \
-        })
-
 #define MMIO_READ(type, addr) (*(volatile type *)(addr))
 #define MMIO_WRITE(type, addr, val) (*(volatile type *)(addr) = (val))
 
@@ -81,5 +64,22 @@
 
 #define constexpr_val(expr, fallback)                                          \
         choose_expr(constant_p(expr), (expr), (fallback))
+
+#define BIT(type, n) ((type)(1) << constexpr((n)))
+#define BITS_U8(n) BIT(u8, n)
+#define BITS_U32(n) BIT(u32, n)
+#define BITS_U64(n) BIT(u64, n)
+#define BIT_SET(x, n) ((x) |= BIT(typeof(x), n))
+#define BIT_CLR(x, n) ((x) &= ~BIT(typeof(x), n))
+#define BIT_FLIP(x, n) ((x) ^= BIT(typeof(x), n))
+#define BIT_TEST(x, n) (!!((x) & BIT(typeof(x), n)))
+
+#define MASK(n) (BIT(usize, n) - 1)
+#define BITS(x, hi, lo)                                                        \
+        ({                                                                     \
+                static_assert((hi) >= (lo), "BITS: hi must be >= lo");         \
+                static_assert((lo) >= 0, "BITS: lo must be >= 0");             \
+                (((x) >> (lo)) & MASK((hi) - (lo) + 1));                       \
+        })
 
 #endif

@@ -1,14 +1,23 @@
 # clib
 
-一个轻量级的 C 语言数据结构与工具库，采用头文件优先的设计，提供高性能、零依赖的基础组件。
+一个轻量级的 C 语言数据结构与工具库，采用头文件优先的设计，面向嵌入式、系统级和 Linux 内核风格开发。
+项目按支持层级提供组件：核心层可以直接用于 freestanding 环境，扩展层通过 `port.h` 抽象接入宿主提供的内存与 I/O 能力。
 
 ## 特性
 
 - **头文件优先**：大部分实现为 `static inline` 函数，无需额外编译链接
-- **零依赖**：支持 freestanding 环境，可完全脱离 libc 运行
-- **现代 C**：采用 C23 标准，支持 `auto` 类型推导、`nullptr`、`bool` 关键字
+- **分层支持**：核心子集可直接用于 freestanding 环境；`lib` 目标默认提供基于 libc 的 `port` 实现
+- **现代 C**：采用 GNU C23 标准，支持 `typeof`、`nullptr`、`bool` 等现代语法
 - **类型安全**：统一的固定宽度类型定义，消除平台差异
-- **高质量**：编译开启完整 Sanitizer，所有组件均有测试覆盖
+- **高质量**：构建默认开启 Sanitizer，所有公开模块均有对应测试
+
+## 支持层级
+
+| 层级 | 说明 | 组件 |
+|------|------|------|
+| `core/freestanding-safe` | 不依赖默认 `port` 实现，可直接用于 freestanding 环境 | `types.h`、`compiler.h`、`tools.h`、`sort.h`、`list.h`、`stack.h`、`ringbuf.h`、`dsu.h`、`rbtree.h` |
+| `port-backed` | 依赖 `port.h` 中声明的接口；`make lib` 默认提供基于 libc 的实现 | `port.h`、`fifo.h`、`vec.h`、`bplustree.h`、`autofree.h` |
+| `hosted/debug` | 面向宿主环境的调试输出能力 | `debug.h` |
 
 ## 架构
 
@@ -26,7 +35,7 @@
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-底层不依赖上层，各层可独立在内核、嵌入式等 freestanding 环境中使用。
+底层不依赖上层。`core/freestanding-safe` 可直接在 freestanding 环境中使用；`port-backed` 需要用户或 `lib` 目标提供 `port` 实现。
 
 ## 项目结构
 
@@ -50,7 +59,7 @@ clib/
 │   ├── rbtree.c       # 红黑树平衡算法实现
 │   ├── bplustree.c    # B+ 树完整实现
 │   └── fifo.c         # FIFO 队列实现
-├── test/              # 测试用例（11 个套件）
+├── test/              # 测试用例
 ├── Makefile
 └── README.md
 ```
@@ -103,7 +112,7 @@ __weak             // 弱符号，允许用户覆盖实现
 
 ### `port.h` — 平台抽象层
 
-抽象内存管理和格式化输出，支持两种工作模式：
+抽象内存管理、内存操作和格式化输出。`port.h` 负责定义接口，不负责在 freestanding 环境中自带运行时实现。
 
 **libc 模式**（编译时定义 `CLIB_USE_LIBC`）：
 
@@ -124,15 +133,17 @@ int   cmemcmp(const void *s1, const void *s2, usize size);
 int cprintf(const char *fmt, ...);
 ```
 
-所有 libc 实现均标记为 `__weak`，用户可在链接时覆盖。
+`make lib` 默认启用这组实现；所有实现均标记为 `__weak`，用户可在链接时覆盖。
 
-**freestanding 模式**（不定义 `CLIB_USE_LIBC`）：
+**freestanding / 自定义宿主模式**（不定义 `CLIB_USE_LIBC`）：
 
 ```c
-// 自行提供上述函数的实现，例如：
+// 自行提供所需函数的实现，例如：
 void *cmalloc(usize size) { return my_allocator(size); }
 void  cfree(void *ptr)    { my_free(ptr); }
 ```
+
+如果仅使用 `core/freestanding-safe` 组件，则不需要提供这些实现。
 
 ---
 
@@ -329,22 +340,22 @@ ringbuf_reset(&rb);
 
 ### `debug.h` — 调试输出
 
-带颜色显示和日志级别过滤的调试宏：
+带颜色显示和日志级别过滤的调试宏，面向 hosted 环境使用：
 
 ```c
 // 通过宏控制最低日志级别（默认 ALL，即全部输出）
-#define LOGLEVEL INFO   // 只输出 INFO 及以上级别
+#define LOGLEVEL INFO
 
 // 日志级别（数值从低到高）
 // ALL(0) < TRACE(1) < DEBUG(2) < INFO(3) < NOTICE(4) < WARNING(5) < ERROR(6)
 
-print(INFO,  "module", "count = %d", count);       // 不换行
-println(NOTICE, "cfg", "using default profile");   // 换行
-println(WARNING, "io", "retrying write operation"); // 换行
-println(ERROR, "net", "connection failed: %s", msg); // 换行
+print(INFO, "count = %d", count);                 // 不换行
+println(NOTICE, "using default profile");         // 换行
+println(WARNING, "retrying write operation");     // 换行
+println(ERROR, "connection failed: %s", msg);     // 换行
 ```
 
-输出格式：`[LEVEL][place][file:line func] message`，按级别着色显示。
+输出格式：`[LEVEL][file:line func] message`，按级别着色显示。
 颜色映射：`ERROR=RED`、`WARNING=YELLOW`、`NOTICE=CYAN`、`INFO=GREEN`、`DEBUG=BLUE`、`TRACE=MAGENTA`。
 
 ---
@@ -401,14 +412,21 @@ void example(void) {
 ## 构建
 
 ```bash
-# Debug 模式（默认）：禁用优化，开启完整 Sanitizer
+# Hosted 库（默认）：提供基于 libc 的 port 实现
 make
+make lib
+
+# Freestanding 核心库：仅构建无默认 port 依赖的核心层
+make freestanding
 
 # Release 模式：LTO + O3 + native 优化
 make BUILD=release
 
-# 运行全部测试
+# 运行全部测试（依赖 lib 目标）
 make test
+
+# 运行 freestanding 核心层测试
+make test-freestanding
 
 # 静态分析
 make analysis
@@ -446,36 +464,55 @@ make clean
 #include <ringbuf.h>
 ```
 
-### 需要链接的组件
+### `lib` 目标
 
-红黑树和 B+ 树有独立 `.c` 文件，需要一起编译：
+`lib` 目标会构建完整 hosted 版本，默认包含基于 libc 的 `port` 实现：
 
 ```bash
-# 编译库目标文件
-make
+# 构建 hosted 库
+make lib
 
 # 链接到自己的程序
 gcc main.c build/clib.o -Iinclude -DCLIB_USE_LIBC -o main
 ```
 
-### Freestanding 环境
+需要链接实现文件的组件包括：
 
-不定义 `CLIB_USE_LIBC`，自行实现 `port.h` 中声明的函数：
+- `rbtree`
+- `fifo`
+- `vec`
+- `bplustree`
+
+### `freestanding` 目标
+
+`freestanding` 目标只构建 `core/freestanding-safe` 层当前需要的目标文件：
+
+```bash
+make freestanding
+```
+
+当前输出为 `build/clib-freestanding.o`，其中包含 `rbtree` 的独立实现；其余核心组件保持头文件直接引用的用法。
+
+### `port-backed` 组件的 freestanding 集成
+
+如果要在 freestanding 环境中使用 `fifo`、`vec`、`bplustree`、`autofree` 等 `port-backed` 组件，需要自行实现 `port.h` 中声明的函数：
 
 ```c
-// 提供自定义内存分配器
+// 提供自定义内存与 I/O 适配
 void *cmalloc(usize size)  { return my_heap_alloc(size); }
 void  cfree(void *ptr)     { my_heap_free(ptr); }
 void *cmemset(void *d, int v, usize n) { /* ... */ return d; }
 // ... 其余函数同理
 ```
 
+也可以直接链接 `lib` 目标提供的默认实现。
+
 ## 适用场景
 
-- **嵌入式 / 内核开发**：freestanding 模式，零 libc 依赖
+- **freestanding / bare-metal**：使用 `core/freestanding-safe` 层
+- **自定义运行时或 RTOS**：为 `port-backed` 组件提供自己的 `port` 实现
 - **高性能数据处理**：B+ 树范围查询，红黑树 O(log n) 有序访问
-- **系统级编程**：侵入式链表、MMIO 宏、自动内存管理
-- **算法竞赛**：轻量数据结构，头文件即插即用
+- **系统级编程**：侵入式链表、MMIO 宏、固定容量容器
 
 ## 许可证
 
