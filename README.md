@@ -472,9 +472,20 @@ make clean
 # 构建 hosted 库
 make lib
 
-# 链接到自己的程序
+# 静态方式链接到自己的程序
 gcc main.c build/clib.o -Iinclude -DCLIB_USE_LIBC -o main
+
+# 动态方式链接到自己的程序
+gcc main.c -Iinclude -Lbuild -lclib -Wl,-rpath,'$ORIGIN/build' -o main
 ```
+
+注意：默认 `make lib` 生成的是带 Sanitizer 的调试构建。如果你的程序按普通方式链接共享库，建议先构建 release 版本：
+
+```bash
+make BUILD=release lib
+```
+
+否则你的应用也需要带上相同的 Sanitizer 选项参与链接。
 
 需要链接实现文件的组件包括：
 

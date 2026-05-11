@@ -82,4 +82,39 @@
                 (((x) >> (lo)) & MASK((hi) - (lo) + 1));                       \
         })
 
+#define __ALIGN_MASK(x, mask) (((x) + (mask)) & ~(mask))
+
+#define ALIGN_UP(x, a)                                                         \
+        ({                                                                     \
+                typeof(x) _x = (x);                                            \
+                typeof(a) _a = (a);                                            \
+                static_assert(constant_p(_a) ? ((_a) != 0) : 1,                \
+                              "ALIGN_UP: alignment must be non-zero");         \
+                static_assert(constant_p(_a) ? (((_a) & ((_a) - 1)) == 0) : 1, \
+                              "ALIGN_UP: alignment must be a power of two");   \
+                __ALIGN_MASK(_x, _a - 1);                                      \
+        })
+
+#define ALIGN_DOWN(x, a)                                                       \
+        ({                                                                     \
+                typeof(x) _x = (x);                                            \
+                typeof(a) _a = (a);                                            \
+                static_assert(constant_p(_a) ? ((_a) != 0) : 1,                \
+                              "ALIGN_DOWN: alignment must be non-zero");       \
+                static_assert(constant_p(_a) ? (((_a) & ((_a) - 1)) == 0) : 1, \
+                              "ALIGN_DOWN: alignment must be a power of two"); \
+                _x & ~(_a - 1);                                                \
+        })
+
+#define IS_ALIGNED(x, a)                                                       \
+        ({                                                                     \
+                typeof(x) _x = (x);                                            \
+                typeof(a) _a = (a);                                            \
+                static_assert(constant_p(_a) ? ((_a) != 0) : 1,                \
+                              "IS_ALIGNED: alignment must be non-zero");       \
+                static_assert(constant_p(_a) ? (((_a) & ((_a) - 1)) == 0) : 1, \
+                              "IS_ALIGNED: alignment must be a power of two"); \
+                ((_x & (_a - 1)) == 0);                                        \
+        })
+
 #endif

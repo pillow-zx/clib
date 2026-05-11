@@ -152,6 +152,24 @@ static void test_tools_constexpr_val_macro(void)
         ASSERT(constexpr_val(TEN, 0) == 10);
 }
 
+static void test_tools_align_macros(void)
+{
+        ASSERT(ALIGN_UP((usize)0, (usize)8) == (usize)0);
+        ASSERT(ALIGN_UP((usize)1, (usize)8) == (usize)8);
+        ASSERT(ALIGN_UP((usize)13, (usize)8) == (usize)16);
+        ASSERT(ALIGN_UP((usize)64, (usize)64) == (usize)64);
+
+        ASSERT(ALIGN_DOWN((usize)0, (usize)8) == (usize)0);
+        ASSERT(ALIGN_DOWN((usize)15, (usize)8) == (usize)8);
+        ASSERT(ALIGN_DOWN((usize)16, (usize)8) == (usize)16);
+        ASSERT(ALIGN_DOWN((usize)127, (usize)64) == (usize)64);
+
+        ASSERT(IS_ALIGNED((usize)0, (usize)8));
+        ASSERT(IS_ALIGNED((usize)64, (usize)64));
+        ASSERT(!IS_ALIGNED((usize)14, (usize)8));
+        ASSERT(!IS_ALIGNED((usize)65, (usize)64));
+}
+
 int main(void)
 {
         RUN_TEST(test_tools_likely_unlikely_macros);
@@ -164,6 +182,7 @@ int main(void)
         RUN_TEST(test_tools_constexpr_macro);
         RUN_TEST(test_tools_constexpr_if_macro);
         RUN_TEST(test_tools_constexpr_val_macro);
+        RUN_TEST(test_tools_align_macros);
         TEST_SUMMARY();
         return TEST_EXIT_CODE();
 }

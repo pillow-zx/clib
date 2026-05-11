@@ -124,7 +124,7 @@ FREESTANDING_OBJ := $(patsubst src/%.c,$(FREESTANDING_OBJ_DIR)/%.o,$(FREESTANDIN
 FREESTANDING_DEPS := $(FREESTANDING_OBJ:.o=.d)
 
 STATIC_OBJ := $(BUILD_DIR)/clib.o
-SHARED_LIB := $(BUILD_DIR)/clib.so
+SHARED_LIB := $(BUILD_DIR)/libclib.so
 FREESTANDING_LIB := $(BUILD_DIR)/clib-freestanding.o
 
 TEST_DIR := test
@@ -132,6 +132,7 @@ TEST_SRC := $(wildcard $(TEST_DIR)/*.c)
 HOSTED_TEST_BIN := $(patsubst $(TEST_DIR)/%.c,$(HOSTED_TEST_DIR)/%,$(TEST_SRC))
 
 FREESTANDING_TEST_NAMES := \
+	test_bitmap.c \
 	test_types.c \
 	test_tools.c \
 	test_sort.c \
