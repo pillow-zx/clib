@@ -62,6 +62,9 @@ static __always_inline void rb_set_black(struct rb_node *node)
 static __always_inline void rb_rotate_left(struct rb_node *node,
                                            struct rb_root *root)
 {
+        assume(node != nullptr);
+        assume(node->right != nullptr);
+
         struct rb_node *right = node->right;
 
         node->right = right->left;
@@ -83,6 +86,9 @@ static __always_inline void rb_rotate_left(struct rb_node *node,
 static __always_inline void rb_rotate_right(struct rb_node *node,
                                             struct rb_root *root)
 {
+        assume(node != nullptr);
+        assume(node->left != nullptr);
+
         struct rb_node *left = node->left;
 
         node->left = left->right;
@@ -138,14 +144,14 @@ rb_last(const struct rb_root *root)
 }
 
 static __always_inline __must_check __pure struct rb_node *
-rb_next(const struct rb_node *node)
+rb_next(struct rb_node *node)
 {
         if (node->right) {
                 node = node->right;
                 while (node->left)
                         node = node->left;
 
-                return (struct rb_node *)node;
+                return node;
         }
 
         struct rb_node *parent = node->parent;
@@ -157,13 +163,13 @@ rb_next(const struct rb_node *node)
 }
 
 static __always_inline __must_check __pure struct rb_node *
-rb_prev(const struct rb_node *node)
+rb_prev(struct rb_node *node)
 {
         if (node->left) {
                 node = node->left;
                 while (node->right)
                         node = node->right;
-                return (struct rb_node *)node;
+                return node;
         }
 
         struct rb_node *parent = node->parent;
@@ -238,10 +244,10 @@ rb_prev(const struct rb_node *node)
                                                        typeof(*(pos)), member) \
                                         : nullptr)
 
-void rb_insert_color(struct rb_node *node, struct rb_root *root);
+__export void rb_insert_color(struct rb_node *node, struct rb_root *root);
 
-void rb_erase_color(struct rb_node *parent, struct rb_root *root);
+__export void rb_erase_color(struct rb_node *parent, struct rb_root *root);
 
-void rb_erase(struct rb_node *node, struct rb_root *root);
+__export void rb_erase(struct rb_node *node, struct rb_root *root);
 
 #endif

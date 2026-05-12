@@ -55,15 +55,16 @@ static __always_inline void vec_reset(struct vector *vec)
         vec->size = 0;
 }
 
-__must_check __nonnull((1, 2)) i32
+__export __must_check __nonnull((1, 2)) i32
         vec_push(struct vector *vec, const void *elem);
 
-__must_check __nonnull((1, 2)) i32 vec_pop(struct vector *vec, void *out);
+__export __must_check __nonnull((1, 2)) i32 vec_pop(struct vector *vec,
+                                                    void *out);
 
-__must_check __nonnull((1, 2)) usize
+__export __must_check __nonnull((1, 2)) usize
         vec_write(struct vector *vec, const void *elem, usize sz);
 
-__must_check __nonnull((1, 2)) usize
+__export __must_check __nonnull((1, 2)) usize
         vec_read(struct vector *vec, void *data, usize sz);
 
 #endif // !__CLIB_VEC_H__

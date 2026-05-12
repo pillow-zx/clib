@@ -122,8 +122,8 @@ list_last(const struct list_head *head)
              &pos->member != (head);                                           \
              pos = n, n = list_entry(n->member.next, typeof(*pos), member))
 
-static __always_inline __must_check
-usize list_size(const struct list_head *head)
+static __always_inline
+        __must_check usize list_size(const struct list_head *head)
 {
         usize count = 0;
         struct list_head *pos;

@@ -130,47 +130,47 @@ __printf(1, 2) int cprintf(const char *fmt, ...);
 #include <stdlib.h>
 #include <string.h>
 
-__weak void *cmalloc(const usize size)
+__hidden __weak void *cmalloc(const usize size)
 {
         return malloc(size);
 }
 
-__weak void *ccalloc(const usize num, const usize size)
+__hidden __weak void *ccalloc(const usize num, const usize size)
 {
         return calloc(num, size);
 }
 
-__weak void *crealloc(void *ptr, const usize size)
+__hidden __weak void *crealloc(void *ptr, const usize size)
 {
         return realloc(ptr, size);
 }
 
-__weak void cfree(void *ptr)
+__hidden __weak void cfree(void *ptr)
 {
         free(ptr);
 }
 
-__weak void *cmemcpy(void *dest, const void *src, const usize size)
+__hidden __weak void *cmemcpy(void *dest, const void *src, const usize size)
 {
         return memcpy(dest, src, size);
 }
 
-__weak void *cmemmove(void *dest, const void *src, const usize size)
+__hidden __weak void *cmemmove(void *dest, const void *src, const usize size)
 {
         return memmove(dest, src, size);
 }
 
-__weak void *cmemset(void *dest, const int value, const usize size)
+__hidden __weak void *cmemset(void *dest, const int value, const usize size)
 {
         return memset(dest, value, size);
 }
 
-__weak int cmemcmp(const void *s1, const void *s2, const usize size)
+__hidden __weak int cmemcmp(const void *s1, const void *s2, const usize size)
 {
         return memcmp(s1, s2, size);
 }
 
-__weak int cprintf(const char *fmt, ...)
+__hidden __weak int cprintf(const char *fmt, ...)
 {
         va_list args;
         va_start(args, fmt);

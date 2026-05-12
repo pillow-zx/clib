@@ -38,6 +38,16 @@
 #define __maybe_unused __attribute__((__unused__))
 #endif
 
+/** @brief 公开导出符号，进入共享库动态符号表。 */
+#ifndef __export
+#define __export __attribute__((__visibility__("default")))
+#endif
+
+/** @brief 隐藏符号，不进入共享库动态符号表。 */
+#ifndef __hidden
+#define __hidden __attribute__((__visibility__("hidden")))
+#endif
+
 /* === 内存布局 === */
 
 /** @brief 取消结构体对齐填充，成员按最小字节紧密排列。 */

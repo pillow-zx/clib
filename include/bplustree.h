@@ -54,29 +54,28 @@ node_is_underflow(const bplus_node_t *node)
         return node->key_count < BPLUS_MIN_KEYS;
 }
 
-__must_check bplus_value_t bplus_search(const bplus_tree_t *tree,
-                                        bplus_key_t key);
+__export __must_check bplus_value_t bplus_search(const bplus_tree_t *tree,
+                                                 bplus_key_t key);
 
-__must_check bplus_node_t *bplus_find_leaf(const bplus_tree_t *tree,
-                                           bplus_key_t key);
+__export __must_check bplus_node_t *bplus_find_leaf(const bplus_tree_t *tree,
+                                                    bplus_key_t key);
 
-__must_check bplus_result_t bplus_range_query(const bplus_tree_t *tree,
-                                              bplus_key_t start,
-                                              bplus_key_t end);
+__export __must_check bplus_result_t
+bplus_range_query(const bplus_tree_t *tree, bplus_key_t start, bplus_key_t end);
 
-void bplus_result_free(bplus_result_t *result);
+__export void bplus_result_free(bplus_result_t *result);
 
-__must_check bool bplus_insert(bplus_tree_t *tree, bplus_key_t key,
-                               bplus_value_t value);
+__export __must_check bool bplus_insert(bplus_tree_t *tree, bplus_key_t key,
+                                        bplus_value_t value);
 
-__must_check bool bplus_delete(bplus_tree_t *tree, bplus_key_t key);
+__export __must_check bool bplus_delete(bplus_tree_t *tree, bplus_key_t key);
 
-__must_check __malloc bplus_tree_t *bplus_create(void);
+__export __must_check __malloc bplus_tree_t *bplus_create(void);
 
-void bplus_destroy(bplus_tree_t *tree);
+__export void bplus_destroy(bplus_tree_t *tree);
 
-__must_check __pure usize bplus_count(const bplus_tree_t *tree);
+__export __must_check __pure usize bplus_count(const bplus_tree_t *tree);
 
-__must_check __pure i32 bplus_height(const bplus_tree_t *tree);
+__export __must_check __pure i32 bplus_height(const bplus_tree_t *tree);
 
 #endif

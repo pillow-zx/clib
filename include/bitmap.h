@@ -144,8 +144,9 @@ static __always_inline __nonnull((1)) void bitmap_set_range(struct bitmap *map,
         map->words[last] |= last_mask;
 }
 
-static __always_inline __nonnull((1)) void
-        bitmap_clear_range(struct bitmap *map, usize start, usize count)
+static __always_inline
+        __nonnull((1)) void bitmap_clear_range(struct bitmap *map, usize start,
+                                               usize count)
 {
         if (count == 0 || unlikely(start >= map->nbits))
                 return;
@@ -275,14 +276,14 @@ static __always_inline __must_check __nonnull((1)) usize
         return count;
 }
 
-static __always_inline __must_check __nonnull((1)) bool
-        bitmap_empty(const struct bitmap *map)
+static __always_inline
+        __must_check __nonnull((1)) bool bitmap_empty(const struct bitmap *map)
 {
         return bitmap_weight(map) == 0;
 }
 
-static __always_inline __must_check __nonnull((1)) bool
-        bitmap_full(const struct bitmap *map)
+static __always_inline
+        __must_check __nonnull((1)) bool bitmap_full(const struct bitmap *map)
 {
         return bitmap_weight(map) == map->nbits;
 }

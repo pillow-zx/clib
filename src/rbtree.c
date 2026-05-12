@@ -1,6 +1,3 @@
-#ifdef CLIB_USE_LIBC
-#include <assert.h>
-#endif
 #include <rbtree.h>
 
 void rb_insert_color(struct rb_node *node, struct rb_root *root)
@@ -57,10 +54,12 @@ void rb_erase_color(struct rb_node *parent, struct rb_root *root)
         struct rb_node *node = nullptr;
 
         while ((!node || !rb_is_red(node)) && node != root->node) {
-                /* 此处断言仅为了消除clang警告，非语义问题 */
-#ifdef CLIB_USE_LIBC
-                assert(parent != nullptr);
-#endif
+                /*
+                 * 删除修复阶段 parent/sibling 由算法不变量保证存在。
+                 * 用 assume 明确告诉优化器，避免 GCC 在 -O3 下误报。
+                 */
+                assume(parent != nullptr);
+
                 if (parent->left == node) {
                         struct rb_node *sibling = parent->right;
 
@@ -71,10 +70,8 @@ void rb_erase_color(struct rb_node *parent, struct rb_root *root)
                                 sibling = parent->right;
                         }
 
-                        /* 此处断言仅为了消除clang警告，非语义问题*/
-#ifdef CLIB_USE_LIBC
-                        assert(sibling != nullptr);
-#endif
+                        assume(sibling != nullptr);
+
                         if ((!sibling->left || !rb_is_red(sibling->left)) &&
                             (!sibling->right || !rb_is_red(sibling->right))) {
                                 rb_set_red(sibling);
@@ -104,6 +101,8 @@ void rb_erase_color(struct rb_node *parent, struct rb_root *root)
                                 rb_rotate_right(parent, root);
                                 sibling = parent->left;
                         }
+
+                        assume(sibling != nullptr);
 
                         if ((!sibling->left || !rb_is_red(sibling->left)) &&
                             (!sibling->right || !rb_is_red(sibling->right))) {

@@ -69,16 +69,18 @@ static __always_inline void fifo_reset(struct fifo *q)
         q->count = 0;
 }
 
-__must_check __nonnull((1, 2)) i32 fifo_push(struct fifo *q, const void *elem);
+__export __must_check __nonnull((1, 2)) i32 fifo_push(struct fifo *q,
+                                                      const void *elem);
 
-__must_check __nonnull((1, 2)) i32 fifo_pop(struct fifo *q, void *out);
+__export __must_check __nonnull((1, 2)) i32 fifo_pop(struct fifo *q, void *out);
 
-__must_check __nonnull((1, 2)) i32 fifo_peek(const struct fifo *q, void *out);
+__export __must_check __nonnull((1, 2)) i32 fifo_peek(const struct fifo *q,
+                                                      void *out);
 
-__must_check __nonnull((1, 2)) usize
+__export __must_check __nonnull((1, 2)) usize
         fifo_write(struct fifo *q, const void *data, const usize count);
 
-__must_check __nonnull((1, 2)) usize
+__export __must_check __nonnull((1, 2)) usize
         fifo_read(struct fifo *q, void *data, const usize count);
 
 #endif /* __CLIB_FIFO_H__ */
