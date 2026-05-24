@@ -32,20 +32,20 @@ static __always_inline __nonnull((1)) void vec_init(struct vector *vec,
         vec->size = 0;
 }
 
-static __always_inline __must_check __pure
-        __nonnull((1)) bool vec_empty(const struct vector *vec)
+static __always_inline __must_check __pure __nonnull((1)) bool
+vec_empty(const struct vector *vec)
 {
         return vec->size == 0;
 }
 
 static __always_inline __must_check __pure __nonnull((1)) usize
-        vec_size(const struct vector *vec)
+vec_size(const struct vector *vec)
 {
         return vec->size;
 }
 
 static __always_inline __must_check __pure __nonnull((1)) usize
-        vec_capacity(const struct vector *vec)
+vec_capacity(const struct vector *vec)
 {
         return vec->capacity;
 }
@@ -55,11 +55,13 @@ static __always_inline void vec_reset(struct vector *vec)
         vec->size = 0;
 }
 
+__export void vec_destroy(struct vector *vec);
+
 __export __must_check __nonnull((1, 2)) i32
         vec_push(struct vector *vec, const void *elem);
 
-__export __must_check __nonnull((1, 2)) i32 vec_pop(struct vector *vec,
-                                                    void *out);
+__export __must_check __nonnull((1, 2)) i32
+        vec_pop(struct vector *vec, void *out);
 
 __export __must_check __nonnull((1, 2)) usize
         vec_write(struct vector *vec, const void *elem, usize sz);

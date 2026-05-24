@@ -248,6 +248,6 @@ __export void rb_insert_color(struct rb_node *node, struct rb_root *root);
 
 __export void rb_erase_color(struct rb_node *parent, struct rb_root *root);
 
-__export void rb_erase(struct rb_node *node, struct rb_root *root);
+__export void rb_erase(const struct rb_node *node, struct rb_root *root);
 
 #endif

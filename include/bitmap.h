@@ -33,7 +33,7 @@ static __always_inline __must_check __const usize bitmap_word_offset(usize bit)
 }
 
 static __always_inline __must_check __const unsigned long
-bitmap_mask_lo(usize bits)
+bitmap_mask_lo(const usize bits)
 {
         if (bits == 0)
                 return 0UL;
@@ -43,35 +43,35 @@ bitmap_mask_lo(usize bits)
 }
 
 static __always_inline __must_check __const unsigned long
-bitmap_mask_hi(usize bit)
+bitmap_mask_hi(const usize bit)
 {
         return ~bitmap_mask_lo(bit);
 }
 
 static __always_inline __must_check __const unsigned long
-bitmap_tail_mask(usize nbits)
+bitmap_tail_mask(const usize nbits)
 {
-        usize tail = nbits % BITMAP_WORD_BITS;
+        const usize tail = nbits % BITMAP_WORD_BITS;
 
         return tail == 0 ? ~0UL : bitmap_mask_lo(tail);
 }
 
 static __always_inline __nonnull((1, 2)) void bitmap_init(struct bitmap *map,
                                                           unsigned long *words,
-                                                          usize nbits)
+                                                          const usize nbits)
 {
         map->words = words;
         map->nbits = nbits;
         map->nwords = BITMAP_WORDS(nbits);
 }
 
-static __always_inline __nonnull((1)) void bitmap_zero(struct bitmap *map)
+static __always_inline __nonnull((1)) void bitmap_zero(const struct bitmap *map)
 {
         for (usize i = 0; i < map->nwords; i++)
                 map->words[i] = 0UL;
 }
 
-static __always_inline __nonnull((1)) void bitmap_fill(struct bitmap *map)
+static __always_inline __nonnull((1)) void bitmap_fill(const struct bitmap *map)
 {
         for (usize i = 0; i < map->nwords; i++)
                 map->words[i] = ~0UL;
@@ -80,8 +80,8 @@ static __always_inline __nonnull((1)) void bitmap_fill(struct bitmap *map)
                 map->words[map->nwords - 1] &= bitmap_tail_mask(map->nbits);
 }
 
-static __always_inline __nonnull((1)) void bitmap_set(struct bitmap *map,
-                                                      usize bit)
+static __always_inline __nonnull((1)) void bitmap_set(const struct bitmap *map,
+                                                      const usize bit)
 {
         if (unlikely(bit >= map->nbits))
                 return;
@@ -89,8 +89,8 @@ static __always_inline __nonnull((1)) void bitmap_set(struct bitmap *map,
         map->words[bitmap_word_index(bit)] |= 1UL << bitmap_word_offset(bit);
 }
 
-static __always_inline __nonnull((1)) void bitmap_clear(struct bitmap *map,
-                                                        usize bit)
+static __always_inline __nonnull((1)) void bitmap_clear(const struct bitmap *map,
+                                                        const usize bit)
 {
         if (unlikely(bit >= map->nbits))
                 return;
@@ -98,8 +98,8 @@ static __always_inline __nonnull((1)) void bitmap_clear(struct bitmap *map,
         map->words[bitmap_word_index(bit)] &= ~(1UL << bitmap_word_offset(bit));
 }
 
-static __always_inline __must_check
-        __nonnull((1)) bool bitmap_test(const struct bitmap *map, usize bit)
+static __always_inline __must_check __nonnull((1)) bool
+        bitmap_test(const struct bitmap *map, const usize bit)
 {
         if (unlikely(bit >= map->nbits))
                 return false;
@@ -108,8 +108,8 @@ static __always_inline __must_check
                   (1UL << bitmap_word_offset(bit)));
 }
 
-static __always_inline __nonnull((1)) void bitmap_assign(struct bitmap *map,
-                                                         usize bit, bool value)
+static __always_inline __nonnull((1)) void bitmap_assign(const struct bitmap *map,
+                                                const usize bit, const bool value)
 {
         if (value)
                 bitmap_set(map, bit);
@@ -117,19 +117,19 @@ static __always_inline __nonnull((1)) void bitmap_assign(struct bitmap *map,
                 bitmap_clear(map, bit);
 }
 
-static __always_inline __nonnull((1)) void bitmap_set_range(struct bitmap *map,
-                                                            usize start,
-                                                            usize count)
+static __always_inline __nonnull((1)) void bitmap_set_range(const struct bitmap *map,
+                                                const usize start, usize count)
 {
         if (count == 0 || unlikely(start >= map->nbits))
                 return;
 
-        usize end = start + MIN(count, map->nbits - start);
-        usize first = bitmap_word_index(start);
-        usize last = bitmap_word_index(end - 1);
-        usize start_bit = bitmap_word_offset(start);
-        usize end_bit = bitmap_word_offset(end);
-        unsigned long last_mask = end_bit == 0 ? ~0UL : bitmap_mask_lo(end_bit);
+        const usize end = start + MIN(count, map->nbits - start);
+        const usize first = bitmap_word_index(start);
+        const usize last = bitmap_word_index(end - 1);
+        const usize start_bit = bitmap_word_offset(start);
+        const usize end_bit = bitmap_word_offset(end);
+        const unsigned long last_mask =
+                end_bit == 0 ? ~0UL : bitmap_mask_lo(end_bit);
 
         if (first == last) {
                 map->words[first] |= bitmap_mask_hi(start_bit) & last_mask;
@@ -144,19 +144,19 @@ static __always_inline __nonnull((1)) void bitmap_set_range(struct bitmap *map,
         map->words[last] |= last_mask;
 }
 
-static __always_inline
-        __nonnull((1)) void bitmap_clear_range(struct bitmap *map, usize start,
-                                               usize count)
+static __always_inline __nonnull((1)) void bitmap_clear_range(const struct bitmap *map,
+                                                const usize start, usize count)
 {
         if (count == 0 || unlikely(start >= map->nbits))
                 return;
 
-        usize end = start + MIN(count, map->nbits - start);
-        usize first = bitmap_word_index(start);
-        usize last = bitmap_word_index(end - 1);
-        usize start_bit = bitmap_word_offset(start);
-        usize end_bit = bitmap_word_offset(end);
-        unsigned long last_mask = end_bit == 0 ? ~0UL : bitmap_mask_lo(end_bit);
+        const usize end = start + MIN(count, map->nbits - start);
+        const usize first = bitmap_word_index(start);
+        const usize last = bitmap_word_index(end - 1);
+        const usize start_bit = bitmap_word_offset(start);
+        const usize end_bit = bitmap_word_offset(end);
+        const unsigned long last_mask =
+                end_bit == 0 ? ~0UL : bitmap_mask_lo(end_bit);
 
         if (first == last) {
                 map->words[first] &= ~(bitmap_mask_hi(start_bit) & last_mask);
@@ -172,7 +172,7 @@ static __always_inline
 }
 
 static __always_inline __must_check __nonnull((1)) usize
-        bitmap_find_first_set(const struct bitmap *map)
+bitmap_find_first_set(const struct bitmap *map)
 {
         for (usize i = 0; i < map->nwords; i++) {
                 unsigned long word = map->words[i];
@@ -188,7 +188,7 @@ static __always_inline __must_check __nonnull((1)) usize
 }
 
 static __always_inline __must_check __nonnull((1)) usize
-        bitmap_find_first_zero(const struct bitmap *map)
+bitmap_find_first_zero(const struct bitmap *map)
 {
         for (usize i = 0; i < map->nwords; i++) {
                 unsigned long word = ~map->words[i];
@@ -204,13 +204,13 @@ static __always_inline __must_check __nonnull((1)) usize
 }
 
 static __always_inline __must_check __nonnull((1)) usize
-        bitmap_find_next_set(const struct bitmap *map, usize start)
+bitmap_find_next_set(const struct bitmap *map, const usize start)
 {
         if (unlikely(start >= map->nbits))
                 return map->nbits;
 
         usize i = bitmap_word_index(start);
-        usize offset = bitmap_word_offset(start);
+        const usize offset = bitmap_word_offset(start);
         unsigned long word = map->words[i] & bitmap_mask_hi(offset);
 
         if (i + 1 == map->nwords)
@@ -232,7 +232,7 @@ static __always_inline __must_check __nonnull((1)) usize
 }
 
 static __always_inline __must_check __nonnull((1)) usize
-        bitmap_find_next_zero(const struct bitmap *map, usize start)
+bitmap_find_next_zero(const struct bitmap *map, const usize start)
 {
         if (unlikely(start >= map->nbits))
                 return map->nbits;
@@ -260,7 +260,7 @@ static __always_inline __must_check __nonnull((1)) usize
 }
 
 static __always_inline __must_check __nonnull((1)) usize
-        bitmap_weight(const struct bitmap *map)
+bitmap_weight(const struct bitmap *map)
 {
         usize count = 0;
 
@@ -276,14 +276,14 @@ static __always_inline __must_check __nonnull((1)) usize
         return count;
 }
 
-static __always_inline
-        __must_check __nonnull((1)) bool bitmap_empty(const struct bitmap *map)
+static __always_inline  __must_check __nonnull((1)) bool
+bitmap_empty(const struct bitmap *map)
 {
         return bitmap_weight(map) == 0;
 }
 
-static __always_inline
-        __must_check __nonnull((1)) bool bitmap_full(const struct bitmap *map)
+static __always_inline __must_check __nonnull((1)) bool
+bitmap_full(const struct bitmap *map)
 {
         return bitmap_weight(map) == map->nbits;
 }

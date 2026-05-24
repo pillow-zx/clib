@@ -1,6 +1,5 @@
 #include <fifo.h>
 #include <port.h>
-#include <compiler.h>
 
 static __always_inline __must_check __pure bool
 fifo_invalid(const struct fifo *q)
@@ -8,16 +7,16 @@ fifo_invalid(const struct fifo *q)
         return !q || !q->buf || q->elem_size == 0 || q->capacity == 0;
 }
 
-static __always_inline __must_check __pure char *fifo_slot(struct fifo *q,
-                                                           usize idx)
+static __always_inline __must_check __pure char *fifo_slot(const struct fifo *q,
+                                                           const usize idx)
 {
-        return q->buf + (idx * q->elem_size);
+        return q->buf + idx * q->elem_size;
 }
 
 static __always_inline __must_check __pure const char *
-fifo_cslot(const struct fifo *q, usize idx)
+fifo_cslot(const struct fifo *q, const usize idx)
 {
-        return q->buf + (idx * q->elem_size);
+        return q->buf + idx * q->elem_size;
 }
 
 i32 fifo_push(struct fifo *q, const void *elem)
@@ -54,9 +53,9 @@ i32 fifo_peek(const struct fifo *q, void *out)
         return 0;
 }
 
-usize fifo_write(struct fifo *q, const void *data, usize count)
+usize fifo_write(struct fifo *q, const void *data, const usize count)
 {
-        const char *src = (const char *)data;
+        const char *src = data;
 
         if (unlikely(fifo_invalid(q) || count == 0))
                 return 0;
@@ -74,14 +73,14 @@ usize fifo_write(struct fifo *q, const void *data, usize count)
         return write_count;
 }
 
-usize fifo_read(struct fifo *q, void *data, usize count)
+usize fifo_read(struct fifo *q, void *data, const usize count)
 {
-        char *dst = (char *)data;
+        char *dst = data;
 
         if (unlikely(fifo_invalid(q) || count == 0))
                 return 0;
 
-        usize read_count = count > q->count ? q->count : count;
+        const usize read_count = count > q->count ? q->count : count;
 
         for (usize i = 0; i < read_count; i++) {
                 cmemcpy(dst + (i * q->elem_size), fifo_slot(q, q->tail),

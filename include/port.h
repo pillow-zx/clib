@@ -7,8 +7,17 @@
  * environments (e.g., kernels, embedded systems).
  *
  * Usage:
- *   - Define CLIB_USE_LIBC to use the default libc implementation
- *   - Otherwise, provide your own implementations of the required functions
+ *   - Memory operation defaults (cmemcpy/cmemmove/cmemset/cmemcmp) are provided
+ *     as weak pure-C implementations.
+ *   - Define CLIB_USE_LIBC to use default libc-backed allocator and printf.
+ *   - Otherwise, provide your own implementations of cmalloc/ccalloc/crealloc/
+ *     cfree/cprintf.
+ *
+ * Visibility and API notes:
+ *   - Declarations in this header are portability hooks (integration ABI),
+ *     not stable exported library APIs.
+ *   - Default fallback definitions in this header are marked __hidden __weak
+ *     to avoid leaking symbols from libclib.so while remaining overrideable.
  *
  * @author clib
  * @date 2026
@@ -23,9 +32,11 @@
 
 /**
  * @defgroup memory Memory Management Interface
- * @brief Abstract memory allocation and manipulation functions
+ * @brief Abstract memory allocation and manipulation hooks
  *
- * Users must provide implementations when not using CLIB_USE_LIBC.
+ * These are portability hooks used by modules depending on port.h.
+ * They are intentionally declared without __export in this header.
+ * Users must provide allocator implementations when not using CLIB_USE_LIBC.
  * All functions follow standard libc semantics.
  * @{
  */
@@ -116,11 +127,72 @@ __printf(1, 2) int cprintf(const char *fmt, ...);
 /** @} */
 
 /* ===========================================================================
+ * Default weak implementation for basic memory operations
+ * ===========================================================================
+ * These fallbacks are hidden to avoid being treated as public shared-library
+ * APIs, and weak so integrators can override them with strong definitions.
+ */
+
+__hidden __weak void *cmemcpy(void *dest, const void *src, const usize size)
+{
+        unsigned char *d = dest;
+        const unsigned char *s = src;
+
+        for (usize i = 0; i < size; i++)
+                d[i] = s[i];
+
+        return dest;
+}
+
+__hidden __weak void *cmemmove(void *dest, const void *src, const usize size)
+{
+        unsigned char *d = dest;
+        const unsigned char *s = src;
+
+        if (d == s || size == 0)
+                return dest;
+
+        if (d < s || d >= s + size) {
+                for (usize i = 0; i < size; i++)
+                        d[i] = s[i];
+        } else {
+                for (usize i = size; i > 0; i--)
+                        d[i - 1] = s[i - 1];
+        }
+
+        return dest;
+}
+
+__hidden __weak void *cmemset(void *dest, const int value, const usize size)
+{
+        unsigned char *d = dest;
+        const unsigned char v = (unsigned char)value;
+
+        for (usize i = 0; i < size; i++)
+                d[i] = v;
+
+        return dest;
+}
+
+__hidden __weak int cmemcmp(const void *s1, const void *s2, const usize size)
+{
+        const unsigned char *a = s1;
+        const unsigned char *b = s2;
+
+        for (usize i = 0; i < size; i++) {
+                if (a[i] != b[i])
+                        return (int)a[i] - (int)b[i];
+        }
+
+        return 0;
+}
+
+/* ===========================================================================
  * Default libc Implementation
  * ===========================================================================
  * Enable with -DCLIB_USE_LIBC during compilation.
  * In freestanding environments, do NOT define CLIB_USE_LIBC and provide
- * your own implementations of the above functions.
+ * your own implementations of cmalloc/ccalloc/crealloc/cfree/cprintf.
  * ===========================================================================
  */
 
@@ -128,7 +200,6 @@ __printf(1, 2) int cprintf(const char *fmt, ...);
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 __hidden __weak void *cmalloc(const usize size)
 {
@@ -150,31 +221,11 @@ __hidden __weak void cfree(void *ptr)
         free(ptr);
 }
 
-__hidden __weak void *cmemcpy(void *dest, const void *src, const usize size)
-{
-        return memcpy(dest, src, size);
-}
-
-__hidden __weak void *cmemmove(void *dest, const void *src, const usize size)
-{
-        return memmove(dest, src, size);
-}
-
-__hidden __weak void *cmemset(void *dest, const int value, const usize size)
-{
-        return memset(dest, value, size);
-}
-
-__hidden __weak int cmemcmp(const void *s1, const void *s2, const usize size)
-{
-        return memcmp(s1, s2, size);
-}
-
 __hidden __weak int cprintf(const char *fmt, ...)
 {
         va_list args;
         va_start(args, fmt);
-        int ret = vprintf(fmt, args);
+        const int ret = vprintf(fmt, args);
         va_end(args);
         return ret;
 }

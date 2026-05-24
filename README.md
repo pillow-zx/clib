@@ -186,11 +186,13 @@ make lib
 - `cmemcmp`
 - `cprintf`
 
+这些符号在本项目中属于“移植层 hook（integration ABI）”，用于对接宿主环境；它们不是 `libclib.so` 对外稳定公共 API 的一部分。项目内部提供的默认实现使用 `__hidden __weak`，以避免符号泄漏，同时允许外部以同名强符号覆盖。
+
 有两种使用方式。
 
 #### 1. hosted / libc 模式
 
-仓库默认按这种方式构建。定义 `CLIB_USE_LIBC` 后，`port.h` 会提供基于 libc 的弱符号实现。
+仓库默认按这种方式构建。定义 `CLIB_USE_LIBC` 后，`port.h` 会提供基于 libc 的弱符号实现（`cmalloc/ccalloc/crealloc/cfree/cprintf`）；而 `cmemcpy/cmemmove/cmemset/cmemcmp` 提供默认弱实现，可在不依赖 `string.h` 的场景下使用。
 
 ```bash
 gcc -std=gnu23 -DCLIB_USE_LIBC -Iinclude app.c src/vec.c -o app
@@ -213,6 +215,23 @@ int cprintf(const char *fmt, ...) { return 0; }
 ## 可用接口
 
 下面按头文件分组给出库中的主要公开接口与用途。
+
+### 公共 API 与移植层 Hook 边界
+
+公共 API（`libclib.so` 对外接口）以导出符号为准，当前由 `test/test_exports.sh` 白名单约束，主要包含：
+
+- `bplus_*`（树的创建、查询、插入、删除、销毁、统计）
+- `fifo_*`（队列读写与状态）
+- `vec_*`（动态数组读写与状态）
+- `rb_insert_color` / `rb_erase_color` / `rb_erase`
+
+移植层 hook（`port.h`）包括：
+
+- `cmalloc` `ccalloc` `crealloc` `cfree`
+- `cmemcpy` `cmemmove` `cmemset` `cmemcmp`
+- `cprintf`
+
+它们用于宿主适配和可替换实现，不作为共享库稳定导出契约；默认实现通过 `__hidden __weak` 提供。
 
 ### 基础层
 
@@ -561,7 +580,7 @@ Linux 内核风格的侵入式双向循环链表。
 说明：
 
 - `vec_init` 和 `VEC_DEFINE` 会申请内部缓冲区
-- 使用结束后应调用 `cfree(vec.buf)` 释放
+- 使用结束后应调用 `vec_destroy(&vec)` 释放
 
 #### `bplustree.h`
 

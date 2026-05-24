@@ -11,9 +11,9 @@ static void borrow_from_right(bplus_node_t *node, bplus_node_t *parent,
 static void merge_into_left(bplus_node_t *left, bplus_node_t *right,
                             bplus_node_t *parent, usize parent_key_idx);
 
-static bplus_node_t *node_create(node_type_t type)
+static bplus_node_t *node_create(const node_type_t type)
 {
-        bplus_node_t *node = (bplus_node_t *)ccalloc(1, sizeof(bplus_node_t));
+        bplus_node_t *node = ccalloc(1, sizeof(bplus_node_t));
         if (unlikely(!node))
                 return nullptr;
         node->type = type;
@@ -32,12 +32,12 @@ static void node_destroy(bplus_node_t *node)
         cfree(node);
 }
 
-static usize binary_search(const bplus_key_t *keys, usize count,
-                           bplus_key_t key)
+static usize binary_search(const bplus_key_t *keys, const usize count,
+                           const bplus_key_t key)
 {
         usize left = 0, right = count;
         while (left < right) {
-                usize mid = left + (right - left) / 2;
+                const usize mid = left + (right - left) / 2;
                 if (keys[mid] < key)
                         left = mid + 1;
                 else
@@ -46,21 +46,22 @@ static usize binary_search(const bplus_key_t *keys, usize count,
         return left;
 }
 
-static bplus_value_t leaf_search(const bplus_node_t *leaf, bplus_key_t key)
+static bplus_value_t leaf_search(const bplus_node_t *leaf,
+                                 const bplus_key_t key)
 {
-        usize idx = binary_search(leaf->keys, leaf->key_count, key);
+        const usize idx = binary_search(leaf->keys, leaf->key_count, key);
         if (idx < leaf->key_count && leaf->keys[idx] == key)
                 return leaf->leaf.values[idx];
 
         return nullptr;
 }
 
-bplus_value_t bplus_search(const bplus_tree_t *tree, bplus_key_t key)
+bplus_value_t bplus_search(const bplus_tree_t *tree, const bplus_key_t key)
 {
         if (unlikely(!tree || !tree->root))
                 return nullptr;
 
-        bplus_node_t *node = tree->root;
+        const bplus_node_t *node = tree->root;
         while (node->type == NODE_INTERNAL) {
                 usize idx = binary_search(node->keys, node->key_count, key);
                 if (idx < node->key_count && node->keys[idx] <= key)
@@ -72,7 +73,7 @@ bplus_value_t bplus_search(const bplus_tree_t *tree, bplus_key_t key)
         return leaf_search(node, key);
 }
 
-bplus_node_t *bplus_find_leaf(const bplus_tree_t *tree, bplus_key_t key)
+bplus_node_t *bplus_find_leaf(const bplus_tree_t *tree, const bplus_key_t key)
 {
         if (unlikely(!tree || !tree->root))
                 return nullptr;
@@ -88,8 +89,8 @@ bplus_node_t *bplus_find_leaf(const bplus_tree_t *tree, bplus_key_t key)
         return node;
 }
 
-bplus_result_t bplus_range_query(const bplus_tree_t *tree, bplus_key_t start,
-                                 bplus_key_t end)
+bplus_result_t bplus_range_query(const bplus_tree_t *tree,
+                                 const bplus_key_t start, const bplus_key_t end)
 {
         bplus_result_t result = {0};
 
@@ -107,7 +108,7 @@ bplus_result_t bplus_range_query(const bplus_tree_t *tree, bplus_key_t start,
         }
         result.capacity = capacity;
 
-        bplus_node_t *leaf = bplus_find_leaf(tree, start);
+        const bplus_node_t *leaf = bplus_find_leaf(tree, start);
 
         while (leaf) {
                 for (usize i = 0; i < leaf->key_count; i++) {
@@ -116,23 +117,21 @@ bplus_result_t bplus_range_query(const bplus_tree_t *tree, bplus_key_t start,
 
                         if (leaf->keys[i] >= start) {
                                 if (result.count >= result.capacity) {
-                                        usize new_capacity =
+                                        const usize new_capacity =
                                                 result.capacity * 2;
-                                        bplus_key_t *new_keys =
-                                                (bplus_key_t *)crealloc(
-                                                        result.keys,
-                                                        new_capacity *
-                                                                sizeof(bplus_key_t));
+                                        bplus_key_t *new_keys = crealloc(
+                                                result.keys,
+                                                new_capacity *
+                                                        sizeof(bplus_key_t));
                                         if (unlikely(!new_keys)) {
                                                 bplus_result_free(&result);
                                                 return (bplus_result_t){0};
                                         }
 
-                                        bplus_value_t *new_values =
-                                                (bplus_value_t *)crealloc(
-                                                        result.values,
-                                                        new_capacity *
-                                                                sizeof(bplus_value_t));
+                                        bplus_value_t *new_values = crealloc(
+                                                result.values,
+                                                new_capacity *
+                                                        sizeof(bplus_value_t));
                                         if (unlikely(!new_values)) {
                                                 cfree(new_keys);
                                                 cfree(result.values);
@@ -187,7 +186,7 @@ static void node_insert_key(bplus_node_t *node, usize idx, bplus_key_t key,
 
 static bplus_key_t leaf_split(bplus_node_t *left, bplus_node_t *right)
 {
-        usize mid = left->key_count / 2;
+        const usize mid = left->key_count / 2;
 
         right->type = NODE_LEAF;
         right->key_count = left->key_count - mid;
@@ -225,7 +224,7 @@ static bplus_key_t internal_split(bplus_node_t *left, bplus_node_t *right)
 
 static bool node_split(bplus_tree_t *tree, bplus_node_t *node)
 {
-        bool is_root = node == tree->root;
+        const bool is_root = node == tree->root;
         bplus_node_t *right = node_create(node->type);
         bplus_node_t *new_root = nullptr;
         bplus_key_t split_key;
@@ -267,7 +266,7 @@ static bool node_split(bplus_tree_t *tree, bplus_node_t *node)
 }
 
 static bool insert_non_full(bplus_tree_t *tree, bplus_node_t *node,
-                            bplus_key_t key, bplus_value_t value)
+                            const bplus_key_t key, const bplus_value_t value)
 {
         usize idx = binary_search(node->keys, node->key_count, key);
 
@@ -279,7 +278,8 @@ static bool insert_non_full(bplus_tree_t *tree, bplus_node_t *node,
                 node_insert_key(node, idx, key, value, nullptr);
                 tree->count++;
                 return true;
-        } else if (node->type == NODE_INTERNAL) {
+        }
+        if (node->type == NODE_INTERNAL) {
                 if (idx < node->key_count && key >= node->keys[idx])
                         idx++;
 
@@ -295,14 +295,13 @@ static bool insert_non_full(bplus_tree_t *tree, bplus_node_t *node,
                         child = node->children[idx];
                 }
                 return insert_non_full(tree, child, key, value);
-        } else
-                unreachable();
+        }
 
         return false;
 }
 
 static bool insert_to_parent(bplus_tree_t *tree, bplus_node_t *left,
-                             bplus_key_t key, bplus_node_t *right)
+                             const bplus_key_t key, bplus_node_t *right)
 {
         if (left == tree->root) {
                 bplus_node_t *new_root = node_create(NODE_INTERNAL);
@@ -359,7 +358,8 @@ static bool insert_to_parent(bplus_tree_t *tree, bplus_node_t *left,
         return true;
 }
 
-bool bplus_insert(bplus_tree_t *tree, bplus_key_t key, bplus_value_t value)
+bool bplus_insert(bplus_tree_t *tree, const bplus_key_t key,
+                  const bplus_value_t value)
 {
         if (unlikely(!tree))
                 return false;
@@ -386,7 +386,7 @@ bool bplus_insert(bplus_tree_t *tree, bplus_key_t key, bplus_value_t value)
         return insert_non_full(tree, tree->root, key, value);
 }
 
-static void leaf_remove(bplus_node_t *leaf, usize idx)
+static void leaf_remove(bplus_node_t *leaf, const usize idx)
 {
         cmemmove(&leaf->keys[idx], &leaf->keys[idx + 1],
                  (leaf->key_count - idx - 1) * sizeof(bplus_key_t));
@@ -410,7 +410,8 @@ static bplus_node_t *find_parent(bplus_node_t *root, bplus_node_t *target)
         return nullptr;
 }
 
-static usize find_child_index(bplus_node_t *parent, bplus_node_t *child)
+static usize find_child_index(const bplus_node_t *parent,
+                              const bplus_node_t *child)
 {
         for (usize i = 0; i <= parent->key_count; i++) {
                 if (parent->children[i] == child)
@@ -434,9 +435,9 @@ static void rebalance_node(bplus_tree_t *tree, bplus_node_t *node)
                 return;
 
         bplus_node_t *left_sibling =
-                (idx > 0) ? parent->children[idx - 1] : nullptr;
+                idx > 0 ? parent->children[idx - 1] : nullptr;
         bplus_node_t *right_sibling =
-                (idx < parent->key_count) ? parent->children[idx + 1] : nullptr;
+                idx < parent->key_count ? parent->children[idx + 1] : nullptr;
 
         if (left_sibling && left_sibling->key_count > BPLUS_MIN_KEYS) {
                 borrow_from_left(node, parent, idx, left_sibling);
@@ -477,7 +478,7 @@ static void rebalance_after_delete(bplus_tree_t *tree, bplus_node_t *leaf)
 }
 
 static void borrow_from_left(bplus_node_t *node, bplus_node_t *parent,
-                             usize idx, bplus_node_t *left_sibling)
+                             const usize idx, bplus_node_t *left_sibling)
 {
         cmemmove(&node->keys[1], &node->keys[0],
                  node->key_count * sizeof(bplus_key_t));
@@ -504,7 +505,7 @@ static void borrow_from_left(bplus_node_t *node, bplus_node_t *parent,
 }
 
 static void borrow_from_right(bplus_node_t *node, bplus_node_t *parent,
-                              usize idx, bplus_node_t *right_sibling)
+                              const usize idx, bplus_node_t *right_sibling)
 {
         if (node->type == NODE_LEAF) {
                 node->keys[node->key_count] = right_sibling->keys[0];
@@ -537,7 +538,7 @@ static void borrow_from_right(bplus_node_t *node, bplus_node_t *parent,
 }
 
 static void merge_into_left(bplus_node_t *left, bplus_node_t *right,
-                            bplus_node_t *parent, usize parent_key_idx)
+                            bplus_node_t *parent, const usize parent_key_idx)
 {
         if (left->type == NODE_LEAF) {
                 cmemcpy(&left->keys[left->key_count], right->keys,
@@ -568,7 +569,7 @@ static void merge_into_left(bplus_node_t *left, bplus_node_t *right,
         cfree(right);
 }
 
-bool bplus_delete(bplus_tree_t *tree, bplus_key_t key)
+bool bplus_delete(bplus_tree_t *tree, const bplus_key_t key)
 {
         if (unlikely(!tree || !tree->root))
                 return false;
@@ -577,7 +578,7 @@ bool bplus_delete(bplus_tree_t *tree, bplus_key_t key)
         if (unlikely(!leaf))
                 return false;
 
-        usize idx = binary_search(leaf->keys, leaf->key_count, key);
+        const usize idx = binary_search(leaf->keys, leaf->key_count, key);
         if (idx >= leaf->key_count || leaf->keys[idx] != key)
                 return false;
 
@@ -591,7 +592,7 @@ bool bplus_delete(bplus_tree_t *tree, bplus_key_t key)
 
 bplus_tree_t *bplus_create(void)
 {
-        bplus_tree_t *tree = (bplus_tree_t *)ccalloc(1, sizeof(bplus_tree_t));
+        bplus_tree_t *tree = ccalloc(1, sizeof(bplus_tree_t));
         if (unlikely(!tree))
                 return nullptr;
 

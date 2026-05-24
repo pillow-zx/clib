@@ -39,25 +39,25 @@ static __always_inline __nonnull((1, 2)) void fifo_init(struct fifo *q,
 }
 
 static __always_inline __must_check __pure __nonnull((1)) bool
-        fifo_empty(const struct fifo *q)
+fifo_empty(const struct fifo *q)
 {
         return q->count == 0;
 }
 
 static __always_inline __must_check __pure __nonnull((1)) bool
-        fifo_full(const struct fifo *q)
+fifo_full(const struct fifo *q)
 {
         return q->count == q->capacity;
 }
 
 static __always_inline __must_check __pure __nonnull((1)) usize
-        fifo_size(const struct fifo *q)
+fifo_size(const struct fifo *q)
 {
         return q->count;
 }
 
 static __always_inline __must_check __pure __nonnull((1)) usize
-        fifo_capacity(const struct fifo *q)
+fifo_capacity(const struct fifo *q)
 {
         return q->capacity;
 }
@@ -69,18 +69,18 @@ static __always_inline void fifo_reset(struct fifo *q)
         q->count = 0;
 }
 
-__export __must_check __nonnull((1, 2)) i32 fifo_push(struct fifo *q,
-                                                      const void *elem);
+__export __must_check __nonnull((1, 2)) i32
+        fifo_push(struct fifo *q, const void *elem);
 
 __export __must_check __nonnull((1, 2)) i32 fifo_pop(struct fifo *q, void *out);
 
-__export __must_check __nonnull((1, 2)) i32 fifo_peek(const struct fifo *q,
-                                                      void *out);
+__export __must_check __nonnull((1, 2)) i32
+        fifo_peek(const struct fifo *q, void *out);
 
 __export __must_check __nonnull((1, 2)) usize
-        fifo_write(struct fifo *q, const void *data, const usize count);
+        fifo_write(struct fifo *q, const void *data, usize count);
 
 __export __must_check __nonnull((1, 2)) usize
-        fifo_read(struct fifo *q, void *data, const usize count);
+        fifo_read(struct fifo *q, void *data, usize count);
 
 #endif /* __CLIB_FIFO_H__ */

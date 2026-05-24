@@ -71,6 +71,20 @@ i32 vec_push(struct vector *vec, const void *elem)
         return 0;
 }
 
+void vec_destroy(struct vector *vec)
+{
+        if (!vec)
+                return;
+
+        if (vec->buf)
+                cfree(vec->buf);
+
+        vec->buf = nullptr;
+        vec->elem_sz = 0;
+        vec->capacity = 0;
+        vec->size = 0;
+}
+
 i32 vec_pop(struct vector *vec, void *out)
 {
         if (unlikely(vec_invalid(vec) || vec->size == 0))

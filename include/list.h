@@ -86,7 +86,7 @@ static __always_inline __must_check __pure bool
 list_empty_careful(const struct list_head *head)
 {
         struct list_head *next = head->next;
-        return (next == head) && (next == head->prev);
+        return next == head && next == head->prev;
 }
 
 static __always_inline __must_check __pure struct list_head *
@@ -122,8 +122,8 @@ list_last(const struct list_head *head)
              &pos->member != (head);                                           \
              pos = n, n = list_entry(n->member.next, typeof(*pos), member))
 
-static __always_inline
-        __must_check usize list_size(const struct list_head *head)
+static __always_inline __must_check usize
+list_size(const struct list_head *head)
 {
         usize count = 0;
         struct list_head *pos;
@@ -133,8 +133,8 @@ static __always_inline
         return count;
 }
 
-static __always_inline __must_check __nonnull((1, 2)) bool list_is_head(
-        const struct list_head *list, const struct list_head *head)
+static __always_inline __must_check __nonnull((1, 2)) bool
+list_is_head(const struct list_head *list, const struct list_head *head)
 {
         return list == head;
 }

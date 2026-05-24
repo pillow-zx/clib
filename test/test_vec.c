@@ -28,7 +28,7 @@ static void test_init_and_push_pop(void)
         ASSERT(vec_empty(&vec));
         ASSERT(vec_pop(&vec, &out) == -1);
 
-        cfree(vec.buf);
+        vec_destroy(&vec);
 }
 
 static void test_write_read_bulk(void)
@@ -54,7 +54,7 @@ static void test_write_read_bulk(void)
         ASSERT(out[1] == 2);
         ASSERT(vec_size(&vec) == 0);
 
-        cfree(vec.buf);
+        vec_destroy(&vec);
 }
 
 static void test_decrease_capacity(void)
@@ -78,7 +78,7 @@ static void test_decrease_capacity(void)
         ASSERT(vec_size(&vec) == 1);
         ASSERT(vec_capacity(&vec) < grown_capacity);
 
-        cfree(vec.buf);
+        vec_destroy(&vec);
 }
 
 static void test_macro_define(void)
@@ -93,7 +93,7 @@ static void test_macro_define(void)
         ASSERT(out == 7);
         ASSERT(vec_empty(&vec));
 
-        cfree(vec.buf);
+        vec_destroy(&vec);
 }
 
 int main(void)

@@ -60,8 +60,9 @@ __export __must_check bplus_value_t bplus_search(const bplus_tree_t *tree,
 __export __must_check bplus_node_t *bplus_find_leaf(const bplus_tree_t *tree,
                                                     bplus_key_t key);
 
-__export __must_check bplus_result_t
-bplus_range_query(const bplus_tree_t *tree, bplus_key_t start, bplus_key_t end);
+__export __must_check bplus_result_t bplus_range_query(const bplus_tree_t *tree,
+                                                       bplus_key_t start,
+                                                       bplus_key_t end);
 
 __export void bplus_result_free(bplus_result_t *result);
 
