@@ -114,6 +114,47 @@ static void test_tools_container_of_macro(void)
         ASSERT(container2 == &obj);
 }
 
+static void test_tools_container_of_const_macro(void)
+{
+        struct my_struct {
+                int a;
+                char b;
+                long member;
+        };
+
+        struct my_struct obj = {.a = 1, .b = 'x', .member = 42};
+        long *ptr = &obj.member;
+
+        static_assert(typesame(container_of_const(ptr, struct my_struct, member),
+                               (struct my_struct *)0),
+                      "container_of_const must keep mutable pointers mutable");
+
+        struct my_struct *container =
+                container_of_const(ptr, struct my_struct, member);
+        ASSERT(container == &obj);
+        container->member = 100;
+        ASSERT(obj.member == 100);
+
+        const struct my_struct const_obj = {
+                .a = 2,
+                .b = 'y',
+                .member = 84,
+        };
+        const long *const_ptr = &const_obj.member;
+
+        static_assert(typesame(container_of_const(const_ptr, struct my_struct,
+                                                 member),
+                               (const struct my_struct *)0),
+                      "container_of_const must preserve const pointers");
+
+        const struct my_struct *const_container =
+                container_of_const(const_ptr, struct my_struct, member);
+        ASSERT(const_container == &const_obj);
+        ASSERT(const_container->a == 2);
+        ASSERT(const_container->b == 'y');
+        ASSERT(const_container->member == 84);
+}
+
 static void test_tools_constexpr_macro(void)
 {
         ASSERT(constexpr(1 + 2) == 3);
@@ -179,6 +220,7 @@ int main(void)
         RUN_TEST(test_tools_typecheck_macro);
         RUN_TEST(test_tools_min_max_macros);
         RUN_TEST(test_tools_container_of_macro);
+        RUN_TEST(test_tools_container_of_const_macro);
         RUN_TEST(test_tools_constexpr_macro);
         RUN_TEST(test_tools_constexpr_if_macro);
         RUN_TEST(test_tools_constexpr_val_macro);

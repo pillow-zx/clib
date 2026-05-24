@@ -11,10 +11,10 @@
 #define MMIO_READ(type, addr) (*(volatile type *)(addr))
 #define MMIO_WRITE(type, addr, val) (*(volatile type *)(addr) = (val))
 
-#define typesame(a, b) _Generic((a), typeof(b): 1, default: 0)
 #define typecheck(type, x) _Generic((x), type: 1, default: 0)
+#define typesame(a, b) types_compatible(a, b)
 
-#define ISARR(arr, msg) static_assert(!types_compatible((arr), &(arr)[0]), msg)
+#define ISARR(arr, msg) static_assert(!typesame((arr), (&(arr)[0])), msg)
 
 #define ARRLEN(arr)                                                            \
         ({                                                                     \
@@ -43,13 +43,27 @@
                 _a < _b ? _a : _b;                                             \
         })
 
-#ifndef container_of
 #define container_of(ptr, type, member)                                        \
         ({                                                                     \
-                typeof(((type *)0)->member) *__mptr = (ptr);                   \
-                (type *)((char *)__mptr - offsetof(type, member));             \
+                static_assert(typesame(*(ptr), ((type *)0)->member) ||         \
+                                      typesame(*(ptr), void),                  \
+                              "pointer type mismatch in container_of()");      \
+                (type *)((void *)((usize)(ptr) - offsetof(type, member)));     \
         })
-#endif
+
+#define container_of_const(ptr, type, member)                                  \
+        ({                                                                     \
+                static_assert(typesame(*(ptr), ((type *)0)->member) ||         \
+                                      typesame(*(ptr), void),                  \
+                              "pointer type mismatch in container_of()");      \
+                _Generic((ptr),                                                \
+                        const typeof(*(ptr)) *: (const type *)((               \
+                                const void *)((const char *)(ptr) -            \
+                                              offsetof(type, member))),        \
+                        default: (                                             \
+                                 (type *)((void *)((usize)(ptr) -              \
+                                                   offsetof(type, member))))); \
+        })
 
 #define constexpr(expr)                                                        \
         ({                                                                     \
